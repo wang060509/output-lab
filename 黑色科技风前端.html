@@ -1,0 +1,651 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Output Lab - Dark Cyber UI</title>
+  <style>
+    :root {
+      /* Dark Sci-Fi Color Palette */
+      --bg: #020617; /* slate-950 */
+      --panel: #0f172a; /* slate-900 */
+      --panel-2: #020617; 
+      --ink: #cbd5e1; /* slate-300 */
+      --ink-dark: #f8fafc; /* slate-50 */
+      --muted: #64748b; /* slate-500 */
+      --line: #1e293b; /* slate-800 */
+      --line-2: #334155; /* slate-700 */
+      
+      --brand: #06b6d4; /* cyan-500 */
+      --brand-hover: #22d3ee; /* cyan-400 */
+      --brand-bg: rgba(6, 182, 212, 0.1);
+      
+      --good: #10b981; /* emerald-500 */
+      --warn: #f59e0b; /* amber-500 */
+      --bad: #ef4444; /* red-500 */
+      
+      --shadow: 0 4px 30px rgba(0, 0, 0, 0.5);
+      --glow-brand: 0 0 15px rgba(6, 182, 212, 0.4);
+      --radius: 12px;
+      
+      --font-sans: Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      --font-mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+    }
+
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    
+    ::selection { background-color: #164e63; color: #cffafe; }
+
+    body {
+      margin: 0;
+      font-family: var(--font-sans);
+      background: var(--bg);
+      color: var(--ink);
+      padding-bottom: 40px;
+    }
+
+    .page {
+      max-width: 1600px;
+      margin: 0 auto;
+      padding: 24px;
+    }
+
+    /* ─── TOPBAR ─── */
+    .topbar {
+      position: sticky;
+      top: 16px;
+      z-index: 30;
+      background: rgba(2, 6, 23, 0.85);
+      backdrop-filter: blur(12px);
+      border: 1px solid var(--line);
+      border-bottom: 2px solid var(--brand);
+      box-shadow: var(--shadow);
+      border-radius: var(--radius);
+      padding: 16px 24px;
+      display: grid;
+      grid-template-columns: 320px 1fr;
+      gap: 24px;
+      margin-bottom: 30px;
+    }
+
+    .brand {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      gap: 8px;
+    }
+
+    .eyebrow {
+      display: inline-flex;
+      width: fit-content;
+      color: var(--brand);
+      background: var(--brand-bg);
+      border: 1px solid rgba(6, 182, 212, 0.2);
+      border-radius: 4px;
+      padding: 4px 8px;
+      font-size: 11px;
+      font-family: var(--font-mono);
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+    }
+
+    .brand h1 {
+      margin: 0;
+      font-size: 20px;
+      color: var(--ink-dark);
+      letter-spacing: 0.05em;
+    }
+
+    .brand p {
+      margin: 0;
+      font-size: 12px;
+      color: var(--muted);
+      font-family: var(--font-mono);
+    }
+
+    .control-grid {
+      display: grid;
+      grid-template-columns: repeat(6, minmax(100px, 1fr)) 140px 140px;
+      gap: 12px;
+      align-items: center;
+    }
+
+    .field {
+      background: var(--panel);
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      padding: 8px 12px;
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+    }
+
+    .field-label {
+      font-size: 10px;
+      font-family: var(--font-mono);
+      text-transform: uppercase;
+      color: var(--muted);
+      margin-bottom: 4px;
+    }
+
+    .field-value {
+      font-size: 13px;
+      color: var(--brand);
+      font-family: var(--font-mono);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .action {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 8px;
+      min-height: 48px;
+      font-size: 14px;
+      font-weight: 700;
+      text-decoration: none;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      font-family: var(--font-sans);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    .action.primary {
+      background: var(--brand);
+      color: #000;
+      border: none;
+      box-shadow: var(--glow-brand);
+    }
+    .action.primary:hover {
+      background: var(--brand-hover);
+      box-shadow: 0 0 25px rgba(6, 182, 212, 0.6);
+      transform: translateY(-1px);
+    }
+
+    .action.secondary {
+      background: var(--panel);
+      color: var(--ink);
+      border: 1px solid var(--line-2);
+    }
+    .action.secondary:hover {
+      border-color: var(--brand);
+      color: var(--brand);
+    }
+
+    /* ─── TERMINAL NOTICE ─── */
+    .notice {
+      background: rgba(245, 158, 11, 0.05);
+      border: 1px solid rgba(245, 158, 11, 0.2);
+      border-left: 3px solid var(--warn);
+      color: var(--warn);
+      border-radius: 6px;
+      padding: 12px 16px;
+      margin-bottom: 24px;
+      display: flex;
+      gap: 12px;
+      align-items: flex-start;
+      font-family: var(--font-mono);
+      font-size: 12px;
+    }
+    .notice strong { display: block; margin-bottom: 4px; color: #fbbf24; }
+    .notice small { color: rgba(245, 158, 11, 0.7); }
+
+    /* ─── LAYOUT ─── */
+    .layout {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) 340px;
+      gap: 24px;
+      align-items: start;
+    }
+
+    /* ─── PANELS (TAB SYSTEM) ─── */
+    .panel {
+      background: var(--panel);
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      overflow: hidden;
+      display: none; /* Hidden by default, JS handles it */
+      animation: fadeIn 0.3s ease-in-out;
+    }
+    .panel.active {
+      display: block;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(5px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .panel-header {
+      padding: 20px 24px;
+      border-bottom: 1px solid var(--line);
+      background: rgba(2, 6, 23, 0.5);
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 18px;
+    }
+
+    .panel-header h2 {
+      margin: 0;
+      font-size: 18px;
+      color: var(--ink-dark);
+      display: flex;
+      gap: 12px;
+      align-items: center;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    .panel-header p {
+      margin: 8px 0 0;
+      color: var(--muted);
+      font-size: 13px;
+      max-width: 800px;
+    }
+
+    .num {
+      width: 28px;
+      height: 28px;
+      border-radius: 4px;
+      display: inline-grid;
+      place-items: center;
+      background: var(--brand-bg);
+      color: var(--brand);
+      font-size: 12px;
+      font-family: var(--font-mono);
+      font-weight: bold;
+      border: 1px solid rgba(6, 182, 212, 0.3);
+    }
+
+    .panel-tools { display: flex; gap: 8px; flex-wrap: wrap; }
+
+    /* ─── PILLS & BADGES ─── */
+    .pill, .chip, .mini-badge {
+      display: inline-flex;
+      align-items: center;
+      border-radius: 4px;
+      padding: 4px 8px;
+      font-size: 11px;
+      font-family: var(--font-mono);
+      font-weight: 600;
+      text-transform: uppercase;
+      background: var(--panel-2);
+      border: 1px solid var(--line-2);
+      color: var(--muted);
+    }
+    .pill.blue, .chip.blue { background: rgba(6, 182, 212, 0.1); color: var(--brand); border-color: rgba(6, 182, 212, 0.2); }
+    .pill.green, .chip.green { background: rgba(16, 185, 129, 0.1); color: var(--good); border-color: rgba(16, 185, 129, 0.2); }
+    .pill.orange, .chip.orange { background: rgba(245, 158, 11, 0.1); color: var(--warn); border-color: rgba(245, 158, 11, 0.2); }
+    .pill.red, .chip.red { background: rgba(239, 68, 68, 0.1); color: var(--bad); border-color: rgba(239, 68, 68, 0.2); }
+
+    .panel-body { padding: 24px; }
+
+    /* ─── INTERNAL GRIDS ─── */
+    .meta-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+    .box { background: var(--bg); border: 1px solid var(--line); border-radius: 8px; padding: 16px; }
+    .box h3 { margin: 0 0 12px; font-size: 13px; color: var(--muted); text-transform: uppercase; font-family: var(--font-mono); letter-spacing: 0.05em; }
+    .box p { margin: 0; color: var(--ink); font-size: 13px; line-height: 1.6; }
+
+    .key-value { display: grid; grid-template-columns: 100px 1fr; gap: 12px; margin-bottom: 10px; font-size: 13px; }
+    .key-value .k { color: var(--muted); font-family: var(--font-mono); font-size: 11px; text-transform: uppercase; }
+    .key-value .v { color: var(--ink); }
+
+    .tag-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin-top: 20px; }
+    .tag-card { border: 1px solid var(--line-2); background: var(--bg); border-radius: 8px; padding: 16px; border-left: 2px solid var(--brand); }
+    .tag-card strong { display: block; margin-bottom: 8px; font-size: 13px; color: var(--ink-dark); font-family: var(--font-mono); }
+    .tag-card p { margin: 0; font-size: 12px; color: var(--muted); }
+
+    /* ─── AUDIENCE GRID ─── */
+    .audience-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 16px; }
+    .aud-card { border: 1px solid var(--line-2); background: var(--bg); border-radius: 8px; padding: 16px; display: flex; flex-direction: column; gap: 12px; }
+    .aud-card .icon { font-family: var(--font-mono); color: var(--brand); font-size: 14px; font-weight: bold; border-bottom: 1px solid var(--line-2); padding-bottom: 8px; }
+    .aud-card h3 { margin: 0; font-size: 13px; color: var(--ink-dark); }
+    .aud-card p { margin: 0; font-size: 12px; color: var(--muted); line-height: 1.5; }
+
+    /* ─── COMPARE GRID ─── */
+    .compare-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; align-items: stretch; }
+    .compare-side { border: 1px solid var(--line); border-radius: 8px; background: var(--bg); padding: 20px; display: flex; flex-direction: column; gap: 16px; }
+    .compare-side h3 { margin: 0; display: flex; justify-content: space-between; align-items: center; font-size: 14px; color: var(--ink-dark); font-family: var(--font-mono); border-bottom: 1px solid var(--line); padding-bottom: 12px; }
+    
+    .text-block { background: var(--panel); border: 1px dashed var(--line-2); border-radius: 8px; padding: 16px; font-size: 13px; line-height: 1.6; }
+    .outline-item { display: grid; grid-template-columns: 120px 1fr; gap: 12px; padding: 10px 0; border-bottom: 1px dashed var(--line); font-size: 13px; }
+    .outline-item strong { color: var(--brand); font-family: var(--font-mono); font-size: 11px; }
+    .outline-item p { margin: 0; color: var(--ink); }
+
+    /* ─── DIAGNOSE & REPAIR ─── */
+    .diagnose-grid, .repair-grid { display: grid; grid-template-columns: 1fr 1.5fr; gap: 20px; }
+    .score-row { display: grid; grid-template-columns: 1fr 40px; gap: 12px; align-items: center; margin-bottom: 16px; font-size: 12px; font-family: var(--font-mono); }
+    .bar { height: 6px; background: var(--line-2); border-radius: 3px; overflow: hidden; margin-top: 6px; }
+    .fill { height: 100%; }
+    .fill.blue { background: var(--brand); box-shadow: 0 0 8px var(--brand); }
+    .fill.red { background: var(--bad); box-shadow: 0 0 8px var(--bad); }
+
+    .check { display: flex; gap: 12px; padding: 12px; border: 1px solid var(--line-2); border-radius: 8px; background: var(--panel); margin-bottom: 10px; }
+    .check .mark { color: var(--good); font-family: var(--font-mono); font-weight: bold; }
+    .check strong { font-size: 13px; color: var(--ink-dark); display: block; margin-bottom: 4px; }
+    .check p { margin: 0; font-size: 12px; color: var(--muted); }
+
+    /* ─── SIDEBAR (TAB NAVIGATION) ─── */
+    .sticky-rail { position: sticky; top: 130px; display: grid; gap: 16px; }
+    .rail-card { background: var(--panel); border: 1px solid var(--line); border-radius: 8px; padding: 20px; }
+    .rail-card h3 { margin: 0 0 16px; font-size: 12px; font-family: var(--font-mono); text-transform: uppercase; color: var(--muted); letter-spacing: 0.1em; }
+    
+    .anchor-list { display: grid; gap: 6px; }
+    .anchor-link { 
+      text-decoration: none; 
+      padding: 12px 16px; 
+      color: var(--muted); 
+      border: 1px solid transparent;
+      border-radius: 6px;
+      display: flex; 
+      justify-content: space-between;
+      font-family: var(--font-mono);
+      font-size: 12px;
+      transition: all 0.2s;
+      cursor: pointer;
+    }
+    .anchor-link:hover { background: var(--bg); border-color: var(--line-2); color: var(--ink); }
+    .anchor-link.active { background: var(--brand-bg); border-color: rgba(6, 182, 212, 0.3); color: var(--brand); border-left: 3px solid var(--brand); }
+
+    /* ─── RESPONSIVE ─── */
+    @media (max-width: 1200px) {
+      .control-grid { grid-template-columns: repeat(4, 1fr); }
+      .audience-grid { grid-template-columns: repeat(3, 1fr); }
+    }
+    @media (max-width: 992px) {
+      .layout { grid-template-columns: 1fr; }
+      .sticky-rail { position: static; display: flex; flex-wrap: wrap; }
+      .rail-card { flex: 1 1 300px; }
+      .compare-grid, .diagnose-grid, .repair-grid, .meta-grid { grid-template-columns: 1fr; }
+      .audience-grid { grid-template-columns: 1fr 1fr; }
+    }
+  </style>
+</head>
+<body>
+  <div class="page">
+    <header class="topbar">
+      <div class="brand">
+        <span class="eyebrow">Output Lab / Core</span>
+        <h1>Research Repair Terminal</h1>
+        <p>System initialized. Waiting for prompt patch sequence...</p>
+      </div>
+      <div class="control-grid">
+        <div class="field"><div class="field-label">Paper</div><div class="field-value">P1·Meta-Analysis</div></div>
+        <div class="field"><div class="field-label">Method</div><div class="field-value">Panel Data</div></div>
+        <div class="field"><div class="field-label">Type</div><div class="field-value">LI Carousel</div></div>
+        <div class="field"><div class="field-label">Benchmark</div><div class="field-value">Think Tank</div></div>
+        <div class="field"><div class="field-label">AI Model</div><div class="field-value">Gemini 3.1 Pro</div></div>
+        <div class="field"><div class="field-label">Prompt</div><div class="field-value">v2.1 Patch</div></div>
+        <a class="action secondary" href="#" onclick="switchTab('compare')">Compare</a>
+        <a class="action primary" href="#" onclick="switchTab('diagnose')">Diagnose</a>
+      </div>
+    </header>
+
+    <div class="notice">
+      <div>[SYS_MSG]</div>
+      <div>
+        <strong>UI Refactored to Tabbed Navigation Mode.</strong>
+        <small>The workspace now isolates one phase at a time to reduce cognitive load. Click the "Workflow Phases" on the right sidebar to navigate between Setup, Benchmark, Compare, Diagnose, and Repair.</small>
+      </div>
+    </div>
+
+    <div class="layout">
+      <main class="workspace">
+        
+        <section class="panel active" id="benchmark">
+          <div class="panel-header">
+            <div>
+              <h2><span class="num">01</span>Benchmark Ground Truth</h2>
+              <p>Extracting real-world genre structures (Problem, Findings, Limitations, Recommendations).</p>
+            </div>
+            <div class="panel-tools">
+              <span class="pill blue">Real-World Sample</span>
+              <span class="pill green">Annotated</span>
+            </div>
+          </div>
+          <div class="panel-body">
+            <div class="meta-grid">
+              <div class="box" style="border-left: 2px solid var(--brand)">
+                <h3>Visual Structure Reference</h3>
+                <div style="height: 180px; background: rgba(6,182,212,0.05); border: 1px dashed var(--line-2); display: flex; align-items: center; justify-content: center; color: var(--muted); font-family: var(--font-mono); font-size: 12px;">
+                  [Screenshot / Visual Mockup Area]
+                </div>
+              </div>
+              <div class="box">
+                <h3>Metadata</h3>
+                <div class="key-value"><div class="k">Source</div><div class="v">Brookings Institute Brief</div></div>
+                <div class="key-value"><div class="k">Format</div><div class="v">Short visual genre</div></div>
+                <div class="key-value"><div class="k">Rationale</div><div class="v">Represents field-standard tone and action framing.</div></div>
+              </div>
+            </div>
+            <div class="tag-grid">
+              <div class="tag-card"><strong>Problem Statement</strong><p>How the benchmark hooks the reader's immediate reality.</p></div>
+              <div class="tag-card"><strong>Findings</strong><p>Evidence presented without losing core methodology logic.</p></div>
+              <div class="tag-card"><strong>Limitations</strong><p>Retention of boundaries, conditions, and uncertainty.</p></div>
+              <div class="tag-card"><strong>Recommendations</strong><p>Actionable advice mapped to specific decision contexts.</p></div>
+              <div class="tag-card"><strong>Scope Conditions</strong><p>Applicability definitions (who, when, where).</p></div>
+              <div class="tag-card"><strong>Cautions</strong><p>Tone calibration and caveat placement.</p></div>
+            </div>
+          </div>
+        </section>
+
+        <section class="panel" id="audience">
+          <div class="panel-header">
+            <div>
+              <h2><span class="num">02</span>Audience Mapping</h2>
+              <p>Dimension 6 & 7 calibration: Reader identity, decision context, and friction points.</p>
+            </div>
+            <div class="panel-tools">
+              <span class="pill blue">Dim 6</span>
+              <span class="pill orange">Decision Context</span>
+            </div>
+          </div>
+          <div class="panel-body">
+            <div class="audience-grid">
+              <div class="aud-card"><div class="icon">SYS_01</div><h3>Who reads this</h3><p>Primary reader: Policy practitioner. Secondary: Analyst.</p></div>
+              <div class="aud-card"><div class="icon">SYS_02</div><h3>What they know</h3><p>Assumed baseline knowledge. Won't verify raw data.</p></div>
+              <div class="aud-card"><div class="icon">SYS_03</div><h3>Must decide</h3><p>Forwarding, adopting, or extracting action cues.</p></div>
+              <div class="aud-card"><div class="icon">SYS_04</div><h3>Ignore trigger</h3><p>Too abstract, lacks payoff, generic AI tone.</p></div>
+              <div class="aud-card"><div class="icon">SYS_05</div><h3>Actionable cue</h3><p>Paced appropriately with explicit next-step value.</p></div>
+            </div>
+          </div>
+        </section>
+
+        <section class="panel" id="compare">
+          <div class="panel-header">
+            <div>
+              <h2><span class="num">03</span>Output Comparison</h2>
+              <p>Side-by-side gap analysis between Ground Truth and raw AI generation.</p>
+            </div>
+            <div class="panel-tools">
+              <span class="pill green">Side-by-Side</span>
+              <span class="pill red">Gap Detetion</span>
+            </div>
+          </div>
+          <div class="panel-body">
+            <div class="compare-grid">
+              <div class="compare-side">
+                <h3><span>Benchmark Structure</span><span class="mini-badge green">Ref</span></h3>
+                <div class="outline-item"><strong>Opening Hook</strong><p>Establishes relevance immediately.</p></div>
+                <div class="outline-item"><strong>Evidence Move</strong><p>Presents findings without flattening context.</p></div>
+                <div class="outline-item"><strong>Limitation Cue</strong><p>Scope and caution preserved.</p></div>
+                <div class="text-block" style="margin-top: 10px;">[Benchmark Text Snippet Placeholder]</div>
+              </div>
+              <div class="compare-side">
+                <h3><span>AI Raw Output (A3)</span><span class="mini-badge orange">Gen</span></h3>
+                <div class="text-block" style="border-color: var(--bad); background: rgba(239, 68, 68, 0.05);">
+                  <p style="color: var(--bad); font-family: var(--font-mono); margin-bottom: 8px;">[ERR] Missing generic component</p>
+                  <p>AI output text goes here. Visually highlighted to show structural gaps like missing payoffs or dropped scope.</p>
+                </div>
+                <div class="box" style="margin-top: auto;">
+                  <h3>Identified Gaps</h3>
+                  <div class="panel-tools">
+                    <span class="pill red">No explicit payoff</span>
+                    <span class="pill orange">Abstract recommendation</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <section class="panel" id="diagnose">
+          <div class="panel-header">
+            <div>
+              <h2><span class="num">04</span>Diagnostics Output</h2>
+              <p>Scoring breakdown and failure mode explanation.</p>
+            </div>
+            <div class="panel-tools">
+              <span class="pill blue">Auto-Scoring</span>
+              <span class="pill red">Risk Flags</span>
+            </div>
+          </div>
+          <div class="panel-body">
+            <div class="diagnose-grid">
+              <div class="box">
+                <h3>Dimension Scores</h3>
+                <div class="score-row"><span>Audience Calibration</span><div><div class="bar"><div class="fill blue" style="width: 60%"></div></div>3/5</div></div>
+                <div class="score-row"><span>Actionability</span><div><div class="bar"><div class="fill blue" style="width: 60%"></div></div>3/5</div></div>
+                <div class="score-row"><span>Scope Fidelity</span><div><div class="bar"><div class="fill red" style="width: 40%"></div></div>2/5</div></div>
+                <div class="score-row"><span>Method Transparency</span><div><div class="bar"><div class="fill red" style="width: 40%"></div></div>2/5</div></div>
+              </div>
+              <div class="box">
+                <h3>Failure Mode Analysis</h3>
+                <div style="margin-bottom: 16px;">
+                  <span class="pill red" style="margin-right: 8px;">genre mismatch</span>
+                  <span class="pill orange">weak action cue</span>
+                </div>
+                <p style="margin-bottom: 12px; color: var(--ink);"><strong>Why low score:</strong> The generated text assumes a generic audience. It summarizes the paper well but fails to map the findings to the specific decision parameters of a policy analyst.</p>
+                <p style="color: var(--ink);"><strong>Priority Fixes:</strong> Re-inject scope conditions and rewrite the conclusion to provide a strict operational recommendation.</p>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <section class="panel" id="repair">
+          <div class="panel-header">
+            <div>
+              <h2><span class="num">05</span>Repair Execution</h2>
+              <p>Applying prompt patches to fix targeted dimension failures.</p>
+            </div>
+            <div class="panel-tools">
+              <span class="pill green">Prompt Patch</span>
+              <span class="pill blue">Diff View</span>
+            </div>
+          </div>
+          <div class="panel-body">
+            <div class="repair-grid">
+              <div class="box">
+                <h3>Repair Checklist</h3>
+                <div class="check"><div class="mark">✓</div><div><strong>Add reader payoff</strong><p>Hook the user immediately.</p></div></div>
+                <div class="check"><div class="mark">✓</div><div><strong>Restore scope cue</strong><p>Prevent generalization.</p></div></div>
+                <div class="check"><div class="mark">✓</div><div><strong>Strengthen action</strong><p>Provide specific next steps.</p></div></div>
+              </div>
+              <div class="box">
+                <h3>Before / After Diff</h3>
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
+                  <div class="text-block" style="border-color: var(--line-2);">
+                    <strong style="color: var(--muted); display:block; margin-bottom: 8px; font-family: var(--font-mono);">[BEFORE]</strong>
+                    <p>Placeholder for faulty text.</p>
+                  </div>
+                  <div class="text-block" style="border-color: var(--good); background: rgba(16,185,129,0.05);">
+                    <strong style="color: var(--good); display:block; margin-bottom: 8px; font-family: var(--font-mono);">[AFTER]</strong>
+                    <p>Placeholder for repaired, dimension-compliant text.</p>
+                  </div>
+                </div>
+                <div class="text-block" style="margin-top: 16px; background: var(--bg); border: 1px solid var(--brand);">
+                  <strong style="color: var(--brand); display:block; margin-bottom: 8px; font-family: var(--font-mono);">Applied Prompt Patch:</strong>
+                  <p style="font-family: var(--font-mono); font-size: 11px; color: var(--muted);">"Rewrite the conclusion. You are writing for [Audience]. Do not summarize. Instead, extract the specific condition under which [Finding X] holds true, and list one immediate verification step the reader should take..."</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+      </main>
+
+      <aside class="sticky-rail">
+        
+        <div class="rail-card">
+          <h3>Workflow Phases</h3>
+          <div class="anchor-list" id="tab-nav">
+            <a class="anchor-link active" data-target="benchmark"><span>01. Benchmark Ground Truth</span></a>
+            <a class="anchor-link" data-target="audience"><span>02. Audience Mapping</span></a>
+            <a class="anchor-link" data-target="compare"><span>03. Output Comparison</span></a>
+            <a class="anchor-link" data-target="diagnose"><span>04. Diagnostics Output</span></a>
+            <a class="anchor-link" data-target="repair"><span>05. Repair Execution</span></a>
+          </div>
+        </div>
+
+        <div class="rail-card">
+          <h3>Target Dimensions</h3>
+          <div class="panel-tools" style="margin-bottom: 12px;">
+            <span class="pill blue">Dim 6: Audience</span>
+            <span class="pill orange">Dim 7: Action</span>
+          </div>
+          <p style="font-size: 12px; color: var(--muted); line-height: 1.5;">This terminal is optimized for genre-aware repair. System strictly evaluates output based on real-world usability over generic linguistic fluency.</p>
+        </div>
+
+        <div class="rail-card">
+          <h3>Active Failure Modes</h3>
+          <div class="panel-tools">
+            <span class="pill red">method omission</span>
+            <span class="pill orange">weak action cue</span>
+            <span class="pill red">scope dropped</span>
+          </div>
+        </div>
+
+      </aside>
+    </div>
+  </div>
+
+  <script>
+    // Tab Switching Logic
+    function switchTab(targetId) {
+      // 1. Hide all panels
+      const panels = document.querySelectorAll('.panel');
+      panels.forEach(panel => {
+        panel.classList.remove('active');
+      });
+
+      // 2. Remove active state from all nav links
+      const links = document.querySelectorAll('.anchor-link');
+      links.forEach(link => {
+        link.classList.remove('active');
+      });
+
+      // 3. Show target panel and set active link
+      const targetPanel = document.getElementById(targetId);
+      if (targetPanel) {
+        targetPanel.classList.add('active');
+        
+        // Find corresponding link and activate
+        const targetLink = document.querySelector(`.anchor-link[data-target="${targetId}"]`);
+        if (targetLink) {
+          targetLink.classList.add('active');
+        }
+        
+        // Scroll to top of workspace smoothly
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      }
+    }
+
+    // Attach click events to nav links
+    document.querySelectorAll('.anchor-link').forEach(link => {
+      link.addEventListener('click', function(e) {
+        e.preventDefault();
+        const target = this.getAttribute('data-target');
+        switchTab(target);
+      });
+    });
+  </script>
+</body>
+</html>
