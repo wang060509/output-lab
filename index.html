@@ -1,20 +1,63 @@
 <!DOCTYPE html>
-<html lang="zh-CN">
+<html lang="en">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Output Lab - Dark Cyber UI</title>
+  <title>Output Lab - AI Playbook QA Interface</title>
   <link rel="stylesheet" href="styles.css" />
 </head>
 <body>
   <div class="page">
     <header class="topbar" id="topbar"></header>
 
-    <div class="notice" id="notice"></div>
-
     <div class="layout">
       <main class="workspace">
-        <section class="panel active" id="benchmark"></section>
+        <section class="panel active" id="try-your-own">
+          <div class="panel-header">
+            <div>
+              <h2><span class="num">00</span>Try Your Own</h2>
+              <p>Paste one generated output draft from the AI Playbook workflow. This tool audits output quality, fidelity risk, audience fit, and actionability.</p>
+            </div>
+          </div>
+          <div class="panel-body">
+            <div class="input-card input-card-primary">
+              <h3>Start Analysis</h3>
+              <div class="output-type-field">
+                <label class="input-label" for="outputTypeSelect">Output Type</label>
+                <select id="outputTypeSelect">
+                  <option selected>Policy Brief</option>
+                  <option>Policy Memo</option>
+                  <option>Executive Summary</option>
+                  <option>Q&amp;A Guide</option>
+                  <option>Fact Sheet</option>
+                  <option>Plain Language Explainer</option>
+                  <option>Op-Ed</option>
+                  <option>Letter to the Editor</option>
+                  <option>Press Release</option>
+                  <option>Elevator Pitch</option>
+                  <option>Report Outline</option>
+                  <option>Technical Note</option>
+                  <option>Infographic Brief</option>
+                  <option>Video Script</option>
+                  <option>LinkedIn Post</option>
+                  <option>LinkedIn Carousel</option>
+                  <option>Position Article</option>
+                  <option>Mechanism Map</option>
+                </select>
+                <p class="output-type-help">Choose the format this draft is meant to become.</p>
+              </div>
+              <label class="input-label" for="userInput">User Input</label>
+              <textarea id="userInput" maxlength="2000" placeholder="Paste one generated output draft from the AI Playbook workflow here..."></textarea>
+              <p class="input-hint">Tip: For higher accuracy, use summaries or key findings (max 2000 chars) instead of full-text papers.</p>
+              <div class="input-actions">
+                <button id="btn-run-diagnose-input" class="action primary" type="button">Analyze Content</button>
+                <button id="btn-explore-sample" class="action secondary" type="button">Explore Workflow Position</button>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <section class="panel" id="benchmark"></section>
         <section class="panel" id="audience"></section>
         <section class="panel" id="compare"></section>
         <section class="panel" id="diagnose"></section>

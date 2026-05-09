@@ -94,13 +94,13 @@ const defaultCaseData = {
     ],
     scoreTitle: "Dimension Scores",
     scores: [
-      { label: "Claim Accuracy", value: 3, max: 5, color: "blue" },
-      { label: "Causal Precision", value: 2, max: 5, color: "red" },
-      { label: "Scope Fidelity", value: 3, max: 5, color: "blue" },
-      { label: "Method Transparency", value: 2, max: 5, color: "red" },
-      { label: "Nuance Preservation", value: 3, max: 5, color: "blue" },
-      { label: "Audience Calibration", value: 4, max: 5, color: "blue" },
-      { label: "Actionability", value: 2, max: 5, color: "red" }
+      { label: "Claim Accuracy", value: 6, max: 10, color: "blue" },
+      { label: "Causal Precision", value: 5, max: 10, color: "red" },
+      { label: "Scope Fidelity", value: 6, max: 10, color: "blue" },
+      { label: "Method Transparency", value: 5, max: 10, color: "red" },
+      { label: "Nuance Preservation", value: 6, max: 10, color: "blue" },
+      { label: "Audience Calibration", value: 7, max: 10, color: "blue" },
+      { label: "Actionability", value: 4, max: 10, color: "red" }
     ],
     analysisTitle: "QA Insight",
     flags: [
@@ -131,7 +131,7 @@ const defaultCaseData = {
     diffTitle: "Before / After Diff",
     beforeLabel: "Original Version",
     beforeText: "The draft makes a useful practitioner-facing point but does not yet show enough source scope, method, or limitation context.",
-    afterLabel: "Repaired Version",
+    afterLabel: "Improved Version",
     afterText: "The repaired draft keeps the practical takeaway while making the evidence boundary visible. It names the source context, avoids unsupported causal language, and gives the audience a bounded next step.",
     patchTitle: "Applied Prompt Patch",
     patchText: "Goal: Improve actionability without weakening fidelity.\n\nStrategy:\n- Fix causal overstatement\n- Restore scope condition\n- Add method signal\n- Improve audience-specific next step\n- Preserve limitations"
@@ -322,13 +322,13 @@ const staticRedesignData = {
     ],
     scoreTitle: "Dimension Scores",
     scores: [
-      { label: "Claim Accuracy", value: 3, max: 5, color: "blue" },
-      { label: "Causal Precision", value: 2, max: 5, color: "red" },
-      { label: "Scope Fidelity", value: 3, max: 5, color: "blue" },
-      { label: "Method Transparency", value: 2, max: 5, color: "red" },
-      { label: "Nuance Preservation", value: 3, max: 5, color: "blue" },
-      { label: "Audience Calibration", value: 4, max: 5, color: "blue" },
-      { label: "Actionability", value: 2, max: 5, color: "red" }
+      { label: "Claim Accuracy", value: 6, max: 10, color: "blue" },
+      { label: "Causal Precision", value: 5, max: 10, color: "red" },
+      { label: "Scope Fidelity", value: 6, max: 10, color: "blue" },
+      { label: "Method Transparency", value: 5, max: 10, color: "red" },
+      { label: "Nuance Preservation", value: 6, max: 10, color: "blue" },
+      { label: "Audience Calibration", value: 7, max: 10, color: "blue" },
+      { label: "Actionability", value: 4, max: 10, color: "red" }
     ],
     analysisTitle: "QA Insight",
     flags: [
@@ -359,7 +359,7 @@ const staticRedesignData = {
     diffTitle: "Before / After Diff",
     beforeLabel: "Original Version",
     beforeText: "This study examines the relationship between accountability and organizational performance in the U.S. federal government. Findings suggest that accountability is positively associated with performance, and autonomy may influence these relationships.",
-    afterLabel: "Repaired Version",
+    afterLabel: "Improved Version",
     afterText: "A study of the U.S. federal workforce finds that accountability practices are associated with reported organizational performance, especially when paired with employee autonomy.\n\nFor practitioners, the useful next step is not to assume a universal causal fix. Instead, review where accountability systems may be too rigid, test changes in the local agency context, and preserve employee discretion where the evidence suggests it matters.\n\nLimit: the evidence is survey-based and should not be presented as proof that accountability reforms alone cause performance gains.",
     patchTitle: "Applied Prompt Patch",
     patchText: "Goal: Improve actionability without weakening fidelity.\n\nStrategy:\n- Fix causal overstatement\n- Restore scope condition\n- Add method signal\n- Improve audience-specific next step\n- Preserve limitations\n\nWhy score improved:\nThe revised version gives practitioners a clearer next step while keeping causal limits, scope boundaries, and method constraints visible."
@@ -395,161 +395,6 @@ const staticRedesignData = {
   }
 };
 
-const outputTypeProfiles = {
-  "Policy Brief": {
-    category: "Decision & Policy Outputs",
-    audience: "Policy staff, program leads, and agency executives",
-    mustInclude: "problem framing, key findings, limitations, implications, and recommendations",
-    mainRisk: "Turning bounded evidence into broad policy prescription.",
-    repairFocus: "Keep recommendations decision-ready while restoring evidence scope, limits, and causal caution."
-  },
-  "Policy Memo": {
-    category: "Decision & Policy Outputs",
-    audience: "Decision-makers or internal leadership audiences",
-    mustInclude: "decision context, recommendation, evidence basis, tradeoffs, and next steps",
-    mainRisk: "Overstating what the source supports for one decision context.",
-    repairFocus: "Clarify the decision, narrow the recommendation, and make tradeoffs visible."
-  },
-  "Executive Summary": {
-    category: "Decision & Policy Outputs",
-    audience: "Senior leaders who need the core takeaway quickly",
-    mustInclude: "purpose, headline findings, scope, implications, and limits",
-    mainRisk: "Compressing away scope, method, or uncertainty.",
-    repairFocus: "Preserve the minimum evidence signals while making the takeaway fast to scan."
-  },
-  "Q&A Guide": {
-    category: "Public Communication Outputs",
-    audience: "Practitioners, public-facing staff, and informed stakeholders",
-    mustInclude: "audience questions, plain answers, evidence cues, caveats, and next-step guidance",
-    mainRisk: "Giving confident answers where the source only supports a qualified response.",
-    repairFocus: "Answer likely questions plainly while keeping caveats and evidence limits attached."
-  },
-  "Fact Sheet": {
-    category: "Public Communication Outputs",
-    audience: "Practitioners, advocates, media, and public-facing staff",
-    mustInclude: "verified facts, definitions, source cues, concise context, and limits",
-    mainRisk: "Presenting interpretive claims as settled facts.",
-    repairFocus: "Separate facts from interpretations and keep every number or claim source-grounded."
-  },
-  "Plain Language Explainer": {
-    category: "Public Communication Outputs",
-    audience: "Non-specialist readers and cross-functional teams",
-    mustInclude: "simple framing, key terms, plain evidence summary, why it matters, and limits",
-    mainRisk: "Simplifying the source until nuance or uncertainty disappears.",
-    repairFocus: "Reduce jargon without removing conditions, uncertainty, or method context."
-  },
-  "Op-Ed": {
-    category: "Public Communication Outputs",
-    audience: "Public readers, civic leaders, and opinion-page audiences",
-    mustInclude: "clear thesis, evidence-backed argument, public relevance, counterpoint, and call to action",
-    mainRisk: "Letting persuasion inflate certainty or causal strength.",
-    repairFocus: "Keep the argument vivid but tether every persuasive claim to the evidence."
-  },
-  "Letter to the Editor": {
-    category: "Public Communication Outputs",
-    audience: "Editors, public readers, and civic stakeholders",
-    mustInclude: "timely hook, concise claim, evidence cue, local relevance, and bounded ask",
-    mainRisk: "Oversimplifying or overgeneralizing to fit a short format.",
-    repairFocus: "Make one narrow public point and preserve the source boundary in compact wording."
-  },
-  "Press Release": {
-    category: "Public Communication Outputs",
-    audience: "Media, communications teams, and public stakeholders",
-    mustInclude: "news hook, accurate summary, quote-ready language, source context, and caveat",
-    mainRisk: "Inflating novelty, certainty, or impact for attention.",
-    repairFocus: "Keep the announcement compelling while removing hype and unsupported impact claims."
-  },
-  "Elevator Pitch": {
-    category: "Professional & Digital Outputs",
-    audience: "Busy decision-makers, partners, or professional peers",
-    mustInclude: "problem, core insight, evidence cue, audience payoff, and next step",
-    mainRisk: "Dropping evidence limits in pursuit of speed.",
-    repairFocus: "Make the pitch concise, specific, and bounded by what the source can support."
-  },
-  "Report Outline": {
-    category: "Decision & Policy Outputs",
-    audience: "Analysts, project teams, and report authors",
-    mustInclude: "section sequence, research questions, evidence needs, limitations, and decision use",
-    mainRisk: "Creating a polished structure that implies analysis not present in the source.",
-    repairFocus: "Align sections with available evidence and mark where detail is missing or uncertain."
-  },
-  "Technical Note": {
-    category: "Decision & Policy Outputs",
-    audience: "Analysts, evaluators, and implementation teams",
-    mustInclude: "method, data or source, assumptions, limitations, and technical implications",
-    mainRisk: "Erasing method detail that changes interpretation.",
-    repairFocus: "Restore method, assumptions, and interpretation limits before giving technical implications."
-  },
-  "Infographic Brief": {
-    category: "Professional & Digital Outputs",
-    audience: "Visual skimmers, policy-practice readers, and communications teams",
-    mustInclude: "visual hierarchy, key data or claims, source notes, captions, and takeaway",
-    mainRisk: "Making visuals cleaner by making claims less precise.",
-    repairFocus: "Convert claims into visual-ready chunks while preserving labels, caveats, and source notes."
-  },
-  "Video Script": {
-    category: "Professional & Digital Outputs",
-    audience: "Viewers who need a short spoken explanation",
-    mustInclude: "hook, narrative beats, evidence cue, plain-language explanation, and closing action",
-    mainRisk: "Turning spoken clarity into unsupported certainty.",
-    repairFocus: "Make the script conversational while keeping evidence limits audible."
-  },
-  "LinkedIn Post": {
-    category: "Professional & Digital Outputs",
-    audience: "Professional networks and policy-practice communities",
-    mustInclude: "hook, takeaway, evidence cue, practical implication, and limitation",
-    mainRisk: "Making a shareable claim stronger than the paper allows.",
-    repairFocus: "Sharpen the hook and takeaway without overstating the evidence."
-  },
-  "LinkedIn Carousel": {
-    category: "Professional & Digital Outputs",
-    audience: "Skimming professional audiences",
-    mustInclude: "slide sequence, one key message per slide, evidence cue, limitation, and takeaway",
-    mainRisk: "Sacrificing nuance for slide-friendly simplicity.",
-    repairFocus: "Break the draft into slide-sized claims with one evidence or caveat signal per move."
-  },
-  "Position Article": {
-    category: "Professional & Digital Outputs",
-    audience: "Professional readers, policy communities, and organizational stakeholders",
-    mustInclude: "position, evidence-backed rationale, implications, counterpoint, and bounded recommendation",
-    mainRisk: "Treating a defensible position as proven by the source alone.",
-    repairFocus: "Strengthen the stance while distinguishing evidence, interpretation, and recommendation."
-  },
-  "Mechanism Map": {
-    category: "Decision & Policy Outputs",
-    audience: "Policy designers, analysts, and implementation teams",
-    mustInclude: "actors, pathway, conditions, evidence strength, and uncertainty",
-    mainRisk: "Turning hypothesized mechanisms into proven causal chains.",
-    repairFocus: "Label actors, pathways, and conditions without implying stronger causality than the source supports."
-  }
-};
-
-const outputTypeGroups = [
-  {
-    category: "Decision & Policy Outputs",
-    description: "Decision-support formats for briefs, memos, summaries, outlines, technical interpretation, and causal pathway thinking.",
-    types: ["Policy Brief", "Policy Memo", "Executive Summary", "Report Outline", "Technical Note", "Mechanism Map"],
-    commonRisk: "Recommendations can outrun the source evidence.",
-    qaFocus: "Check decision context, evidence limits, method signals, and bounded next steps."
-  },
-  {
-    category: "Public Communication Outputs",
-    description: "Public-facing formats that translate evidence for stakeholders, media, civic audiences, and non-specialist readers.",
-    types: ["Fact Sheet", "Plain Language Explainer", "Press Release", "Op-Ed", "Letter to the Editor", "Q&A Guide"],
-    commonRisk: "Clarity or persuasion can flatten uncertainty.",
-    qaFocus: "Separate facts from interpretation and keep caveats visible in plain language."
-  },
-  {
-    category: "Professional & Digital Outputs",
-    description: "Compact professional formats for spoken, visual, social, and thought-leadership communication.",
-    types: ["Elevator Pitch", "Infographic Brief", "Video Script", "LinkedIn Post", "LinkedIn Carousel", "Position Article"],
-    commonRisk: "Shareability can make claims too broad or too confident.",
-    qaFocus: "Make the format scannable while preserving source cues, scope, and limitations."
-  }
-];
-
-window.outputTypeProfiles = outputTypeProfiles;
-
 function isPlainObject(value) {
   return Boolean(value) && typeof value === "object" && !Array.isArray(value);
 }
@@ -570,8 +415,6 @@ function deepMerge(base, override) {
 
 const caseData = deepMerge(deepMerge(defaultCaseData, staticRedesignData), window.caseData || {});
 window.caseData = caseData;
-const AUDIT_HISTORY_KEY = "output-lab-audit-history";
-const MAX_AUDIT_HISTORY = 10;
 let latestDiagnoseState = null;
 let typeWriterToken = 0;
 let panelSwitchToken = 0;
@@ -591,315 +434,6 @@ function wait(ms) {
   });
 }
 
-function readAuditHistory() {
-  try {
-    const storedHistory = window.localStorage?.getItem(AUDIT_HISTORY_KEY);
-    if (!storedHistory) {
-      return [];
-    }
-
-    const parsedHistory = JSON.parse(storedHistory);
-    return Array.isArray(parsedHistory) ? parsedHistory.filter(isPlainObject) : [];
-  } catch (error) {
-    return [];
-  }
-}
-
-function writeAuditHistory(history) {
-  try {
-    const trimmedHistory = Array.isArray(history) ? history.slice(0, MAX_AUDIT_HISTORY) : [];
-    window.localStorage?.setItem(AUDIT_HISTORY_KEY, JSON.stringify(trimmedHistory));
-  } catch (error) {
-    console.warn("Audit history could not be saved.", error);
-  }
-}
-
-function createAuditRecordId() {
-  return `audit-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
-}
-
-function formatAuditTimestamp(timestamp) {
-  const date = new Date(timestamp);
-  if (Number.isNaN(date.getTime())) {
-    return "Recent";
-  }
-
-  return date.toLocaleString("en-US", {
-    month: "short",
-    day: "numeric",
-    hour: "numeric",
-    minute: "2-digit"
-  });
-}
-
-function formatAverageScore(score) {
-  const numericScore = Number(score);
-  return Number.isFinite(numericScore) ? numericScore.toFixed(1) : "0.0";
-}
-
-function getScoreRowsFromMap(scores = {}) {
-  return [
-    { label: "Claim Accuracy", key: "claimAccuracy" },
-    { label: "Causal Precision", key: "causalPrecision" },
-    { label: "Scope Fidelity", key: "scopeFidelity" },
-    { label: "Method Transparency", key: "methodTransparency" },
-    { label: "Nuance Preservation", key: "nuancePreservation" },
-    { label: "Audience Calibration", key: "audienceCalibration" },
-    { label: "Actionability", key: "actionability" }
-  ].map((score) => ({
-    label: score.label,
-    value: clampScore(Number(scores[score.key]) || 3)
-  }));
-}
-
-function getAverageScore(scoreRows) {
-  if (!scoreRows.length) {
-    return 0;
-  }
-
-  return scoreRows.reduce((sum, score) => sum + score.value, 0) / scoreRows.length;
-}
-
-function getAuditProfile(profile = {}) {
-  return {
-    audience: profile.audience || "",
-    mainRisk: profile.mainRisk || "",
-    repairFocus: profile.repairFocus || ""
-  };
-}
-
-function renderSelectedOutputTypeMeta(outputType, profile = {}) {
-  const selectedOutputMeta = document.getElementById("selectedOutputTypeMeta");
-  if (!selectedOutputMeta) {
-    return;
-  }
-
-  selectedOutputMeta.innerHTML = `
-    <p><strong>Selected Output Type:</strong> ${escapeHtml(outputType)}</p>
-    <p><strong>Audience:</strong> ${escapeHtml(profile.audience || "")}</p>
-    <p><strong>Main Fidelity Risk:</strong> ${escapeHtml(profile.mainRisk || "")}</p>
-  `;
-}
-
-function renderAuditHistoryList(history) {
-  if (!history.length) {
-    return `<p class="history-empty">No audits yet.</p>`;
-  }
-
-  return history
-    .map((record) => {
-      const outputType = record.outputType || "Audit";
-      return `
-        <button class="history-item" type="button" data-history-id="${escapeHtml(record.id || "")}">
-          <span class="history-item-main">${escapeHtml(outputType)} · ${escapeHtml(formatAverageScore(record.overallAverage))}/5</span>
-          <span class="history-item-time">${escapeHtml(formatAuditTimestamp(record.timestamp))}</span>
-        </button>
-      `;
-    })
-    .join("");
-}
-
-function renderHistoryRail() {
-  const historyList = document.getElementById("auditHistoryList");
-  const clearButton = document.getElementById("btn-clear-history");
-  if (!historyList) {
-    return;
-  }
-
-  const history = readAuditHistory();
-  historyList.innerHTML = renderAuditHistoryList(history);
-
-  if (clearButton) {
-    clearButton.disabled = history.length === 0;
-  }
-}
-
-function saveDiagnoseHistoryRecord(state) {
-  const scoreRows = state.rows || getScoreRowsFromMap(state.scores);
-  const overallAverage = getAverageScore(scoreRows);
-  const overallVerdict = getOverallVerdict(overallAverage);
-  const id = state.historyRecordId || createAuditRecordId();
-  const record = {
-    id,
-    timestamp: new Date().toISOString(),
-    outputType: state.outputType,
-    input: state.input,
-    scores: { ...state.scores },
-    issues: [...state.issues],
-    overallAverage,
-    overallVerdict: overallVerdict.text,
-    profile: getAuditProfile(state.profile)
-  };
-  const history = readAuditHistory().filter((item) => item.id !== id);
-
-  history.unshift(record);
-  writeAuditHistory(history);
-  renderHistoryRail();
-
-  return id;
-}
-
-function updateLatestHistoryRepair(repairText) {
-  if (!latestDiagnoseState) {
-    return;
-  }
-
-  const history = readAuditHistory();
-  const targetIndex = history.findIndex((record) => record.id === latestDiagnoseState.historyRecordId);
-  const fallbackIndex = targetIndex === -1
-    ? history.findIndex((record) => record.input === latestDiagnoseState.input && record.outputType === latestDiagnoseState.outputType)
-    : targetIndex;
-
-  if (fallbackIndex === -1) {
-    return;
-  }
-
-  history[fallbackIndex] = {
-    ...history[fallbackIndex],
-    repairText
-  };
-  latestDiagnoseState.repairText = repairText;
-  writeAuditHistory(history);
-  renderHistoryRail();
-}
-
-function clearAuditHistory() {
-  try {
-    window.localStorage?.removeItem(AUDIT_HISTORY_KEY);
-  } catch (error) {
-    console.warn("Audit history could not be cleared.", error);
-  }
-
-  renderHistoryRail();
-}
-
-function restoreAuditRecord(recordId) {
-  const record = readAuditHistory().find((item) => item.id === recordId);
-  if (!record) {
-    return;
-  }
-
-  const outputType = record.outputType || "Policy Brief";
-  const input = record.input || "";
-  const profile = outputTypeProfiles[outputType] || record.profile || {};
-  const scoreRows = getScoreRowsFromMap(record.scores);
-  const overallAverage = Number.isFinite(Number(record.overallAverage))
-    ? Number(record.overallAverage)
-    : getAverageScore(scoreRows);
-  const verdict = getOverallVerdict(overallAverage);
-  const inputElement = document.getElementById("userInput");
-  const outputTypeSelect = document.getElementById("outputTypeSelect");
-  const beforeOutput = document.getElementById("beforeOutput");
-  const afterOutput = document.getElementById("afterOutput");
-  const scoresBox = document.getElementById("diagnoseScores");
-  const liveScore = document.getElementById("liveScore");
-  const liveDiagnose = document.getElementById("liveDiagnose");
-  const aiWhyLowScore = document.getElementById("aiWhyLowScore");
-  const aiRepairPatch = document.getElementById("aiRepairPatch");
-  const issues = Array.isArray(record.issues) ? [...record.issues] : [];
-
-  typeWriterToken += 1;
-
-  if (inputElement) {
-    inputElement.value = input;
-  }
-
-  if (outputTypeSelect) {
-    outputTypeSelect.value = outputType;
-  }
-
-  caseData.text = input;
-  caseData.repair.beforeText = input;
-
-  renderSelectedOutputTypeMeta(outputType, { ...profile, ...record.profile });
-
-  if (beforeOutput) {
-    beforeOutput.textContent = input;
-  }
-
-  if (afterOutput) {
-    afterOutput.textContent = record.repairText || "No repair saved for this audit yet.";
-  }
-
-  if (scoresBox) {
-    scoresBox.innerHTML = `
-      <div style="margin-bottom: 16px;">
-        <p style="margin: 0 0 6px; font-size: 12px; color: var(--muted); font-family: var(--font-mono); text-transform: uppercase;">Overall Verdict</p>
-        <p id="diagnoseVerdict" style="margin: 0; font-weight: 700; color: ${verdict.color}; min-height: 20px;">${escapeHtml(verdict.text)}</p>
-      </div>
-      ${scoreRows
-        .map((score) => {
-          const width = `${(score.value / 5) * 100}%`;
-          const color = getScoreColor(score.value);
-          return `
-            <div style="margin-bottom: 16px;">
-              <div class="score-row" style="margin-bottom: 6px;">
-                <span>${escapeHtml(score.label)}</span>
-                <div>
-                  <div class="bar"><div class="fill ${escapeHtml(color)}" style="width: ${width}"></div></div>
-                  ${escapeHtml(`${score.value}/5`)}
-                </div>
-              </div>
-              <p style="margin: 0; color: var(--muted); font-size: 12px; line-height: 1.5; min-height: 18px;">${escapeHtml(getScoreExplanation(score.label, score.value))}</p>
-            </div>
-          `;
-        })
-        .join("")}
-    `;
-  }
-
-  if (liveScore) {
-    liveScore.textContent = "Restored from Recent Audits";
-  }
-
-  if (liveDiagnose) {
-    liveDiagnose.textContent = `Rule-based flags: ${issues.length ? issues.join(", ") : "None"}`;
-  }
-
-  const fallback = generateLocalInsight(input, record.scores || {});
-  if (aiWhyLowScore) {
-    aiWhyLowScore.textContent = fallback.insight;
-  }
-
-  if (aiRepairPatch) {
-    aiRepairPatch.textContent = fallback.repair;
-  }
-
-  latestDiagnoseState = {
-    input,
-    outputType,
-    profile,
-    issues,
-    scores: { ...(record.scores || {}) },
-    rows: scoreRows,
-    historyRecordId: record.id,
-    repairText: record.repairText || ""
-  };
-
-  showPanel("diagnose");
-}
-
-function bindHistoryActions() {
-  const rail = document.getElementById("right-rail");
-  if (!rail || rail.dataset.historyBound === "true") {
-    return;
-  }
-
-  rail.dataset.historyBound = "true";
-  rail.addEventListener("click", (event) => {
-    const clearButton = event.target.closest("#btn-clear-history");
-    if (clearButton) {
-      clearAuditHistory();
-      return;
-    }
-
-    const historyButton = event.target.closest("[data-history-id]");
-    if (historyButton) {
-      restoreAuditRecord(historyButton.getAttribute("data-history-id"));
-    }
-  });
-}
-
 async function typeWriter(elementId, text, speed = 15) {
   const element = typeof elementId === "string" ? document.getElementById(elementId) : elementId;
   if (!element) {
@@ -911,10 +445,6 @@ async function typeWriter(elementId, text, speed = 15) {
   const shouldShowCursor = element.id === "aiWhyLowScore" || element.id === "aiRepairPatch" || element.id === "afterOutput";
 
   for (let index = 0; index < text.length; index += 1) {
-    if (!element.isConnected) {
-      return;
-    }
-
     if (token !== typeWriterToken) {
       return;
     }
@@ -924,7 +454,7 @@ async function typeWriter(elementId, text, speed = 15) {
     await wait(speed);
   }
 
-  if (!shouldShowCursor || token !== typeWriterToken || !element.isConnected) {
+  if (!shouldShowCursor || token !== typeWriterToken) {
     return;
   }
 
@@ -938,28 +468,6 @@ function renderPills(items) {
   return items
     .map((item) => `<span class="pill ${escapeHtml(item.color)}">${escapeHtml(item.label)}</span>`)
     .join("");
-}
-
-function renderWorkflowTimeline(placeholder) {
-  const steps = String(placeholder || "")
-    .split(/\s*(?:\u2192|->)\s*/)
-    .map((step) => step.trim())
-    .filter(Boolean);
-
-  return `
-    <div class="workflow-timeline">
-      ${steps
-        .map(
-          (step, index) => `
-            <div class="workflow-step">
-              <span>${escapeHtml(String(index + 1).padStart(2, "0"))}</span>
-              <strong>${escapeHtml(step)}</strong>
-            </div>
-          `
-        )
-        .join("")}
-    </div>
-  `;
 }
 
 function renderPanelHeader(panel) {
@@ -988,7 +496,8 @@ function renderTopBar() {
     </div>
     <div>
       <div class="mode-toggle" style="display:flex; gap:8px; align-items:center;">
-        <button class="mode-btn active" type="button" aria-disabled="true">Demo QA Mode</button>
+        <span style="font-size:12px; color: var(--muted);">Mode:</span>
+        <button class="mode-btn active" type="button" aria-disabled="true">Demo</button>
       </div>
     </div>
   `;
@@ -1006,7 +515,9 @@ function renderBenchmark() {
       <div class="meta-grid">
         <div class="box" style="border-left: 2px solid var(--brand)">
           <h3>${escapeHtml(caseData.benchmark.visualTitle)}</h3>
-          ${renderWorkflowTimeline(caseData.benchmark.visualPlaceholder)}
+          <div style="min-height: 180px; background: rgba(6,182,212,0.05); border: 1px dashed var(--line-2); display: flex; align-items: center; justify-content: center; color: var(--muted); font-family: var(--font-mono); font-size: 12px; text-align: center; padding: 16px; border-radius: 8px;">
+            <pre style="margin: 0; white-space: pre-wrap; font: inherit; color: inherit; text-align: center; line-height: 1.8;">${escapeHtml(caseData.benchmark.visualPlaceholder)}</pre>
+          </div>
         </div>
         <div class="box">
           <h3>${escapeHtml(caseData.benchmark.metadataTitle)}</h3>
@@ -1048,21 +559,23 @@ function renderAudience() {
     ${renderPanelHeader(caseData.audience)}
     <div class="panel-body">
       <div class="audience-grid">
-        ${outputTypeGroups
-          .map((group, index) => `
-            <div class="aud-card output-standard-card">
-              <div class="icon">${escapeHtml(`GROUP_${String(index + 1).padStart(2, "0")}`)}</div>
-              <h3>${escapeHtml(group.category)}</h3>
-              <p class="output-standard-description">${escapeHtml(group.description)}</p>
-              <div class="output-type-tags">
-                ${group.types.map((type) => `<span class="output-type-tag">${escapeHtml(type)}</span>`).join("")}
+        ${caseData.audience.cards
+          .map((card, index) => {
+            const outputType = card.outputType || card.title;
+            const audience = card.audience || "";
+            const mustInclude = card.mustInclude || "";
+            const mainRisk = card.mainRisk || "";
+
+            return `
+              <div class="aud-card">
+                <div class="icon">${escapeHtml(card.icon || `TYPE_${String(index + 1).padStart(2, "0")}`)}</div>
+                <h3>${escapeHtml(outputType)}</h3>
+                ${audience ? `<p><strong>Audience:</strong> ${escapeHtml(audience)}</p>` : ""}
+                ${mustInclude ? `<p><strong>Must Include:</strong> ${escapeHtml(mustInclude)}</p>` : ""}
+                ${mainRisk ? `<p><strong>Main Fidelity Risk:</strong> ${escapeHtml(mainRisk)}</p>` : ""}
               </div>
-              <div class="output-standard-meta">
-                <p><strong>Common Fidelity Risk:</strong> ${escapeHtml(group.commonRisk)}</p>
-                <p><strong>QA Focus:</strong> ${escapeHtml(group.qaFocus)}</p>
-              </div>
-            </div>
-          `)
+            `;
+          })
           .join("")}
       </div>
     </div>
@@ -1112,7 +625,7 @@ function renderDiagnose() {
           <div style="margin-bottom: 16px;">${renderPills(caseData.diagnose.flags)}</div>
           <p style="margin-bottom: 12px; color: var(--ink);"><strong>Insight:</strong> <span id="aiWhyLowScore">${escapeHtml(caseData.diagnose.whyLowScore)}</span></p>
           <p style="color: var(--ink);"><strong>Suggested Improvement:</strong> <span id="aiRepairPatch">${escapeHtml(caseData.diagnose.priorityFixes)}</span></p>
-          <div class="assessment-badge"><span class="status-dot"></span><span>Rule-based Demo Assessment</span></div>
+          <div class="ai-confidence"><span class="pulse-dot"></span><span>Rule-based Demo Assessment</span></div>
           <p id="liveDiagnose" style="color: var(--ink); margin: 12px 0 0;"></p>
         </div>
         <div class="box">
@@ -1121,26 +634,19 @@ function renderDiagnose() {
             <button id="btn-run-diagnose" class="action primary" type="button">Run Diagnose</button>
           </div>
           <div class="framework-badge">Evaluation Protocol: Output Lab Fidelity QA v1.0</div>
-          <div id="selectedOutputTypeMeta" class="output-type-summary">
-            <p><strong>Selected Output Type:</strong> ${escapeHtml("Policy Brief")}</p>
-            <p><strong>Audience:</strong> ${escapeHtml(outputTypeProfiles["Policy Brief"].audience)}</p>
-            <p><strong>Main Fidelity Risk:</strong> ${escapeHtml(outputTypeProfiles["Policy Brief"].mainRisk)}</p>
-          </div>
-          <p style="margin: 0 0 14px; color: var(--muted); font-size: 12px; line-height: 1.5;">Demo scores follow the course 1&ndash;5 fidelity scoring framework. Scores of 2 or below and 5 require written justification in the portfolio.</p>
           <div id="diagnoseScores">
             <p id="diagnosePlaceholder" style="color: var(--muted); margin: 0 0 16px;">Run diagnose to see evaluation</p>
           </div>
           <div id="scoreResult">
             ${caseData.diagnose.scores
               .map((score) => {
-                const width = `${(score.value / 5) * 100}%`;
-                const color = getScoreColor(score.value);
+                const width = `${(score.value / score.max) * 100}%`;
                 return `
                   <div class="score-row">
                     <span>${escapeHtml(score.label)}</span>
                     <div>
-                      <div class="bar"><div class="fill ${escapeHtml(color)}" style="width: ${width}"></div></div>
-                      ${escapeHtml(`${score.value}/5`)}
+                      <div class="bar"><div class="fill ${escapeHtml(score.color)}" style="width: ${width}"></div></div>
+                      ${escapeHtml(`${score.value}/${score.max}`)}
                     </div>
                   </div>
                 `;
@@ -1185,12 +691,12 @@ function renderRepair() {
             <h3 style="margin: 0;">${escapeHtml(caseData.repair.diffTitle)}</h3>
             <button id="btn-run-repair" class="action primary" type="button">Generate Repair</button>
           </div>
-          <div class="repair-compare-layout">
-            <div class="text-block before-report">
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
+            <div class="text-block" style="border-color: var(--line-2);">
               <strong style="color: var(--muted); display:block; margin-bottom: 8px; font-family: var(--font-mono);">${escapeHtml(caseData.repair.beforeLabel)}</strong>
               <p id="beforeOutput">${escapeHtml(caseData.repair.beforeText)}</p>
             </div>
-            <div class="text-block after-report">
+            <div class="text-block" style="border-color: var(--good); background: rgba(16,185,129,0.05);">
               <div class="repair-output-header">
                 <strong>${escapeHtml(caseData.repair.afterLabel)}</strong>
                 <button id="btn-copy-repair" class="action secondary repair-copy" type="button">Copy</button>
@@ -1198,8 +704,8 @@ function renderRepair() {
               <pre id="afterOutput">${escapeHtml(caseData.repair.afterText)}</pre>
             </div>
           </div>
-          <div class="text-block repair-patch-block">
-            <strong style="color: var(--brand-hover); display:block; margin-bottom: 8px; font-family: var(--font-mono);">${escapeHtml(caseData.repair.patchTitle)}:</strong>
+          <div class="text-block" style="margin-top: 16px; background: var(--bg); border: 1px solid var(--brand);">
+            <strong style="color: var(--brand); display:block; margin-bottom: 8px; font-family: var(--font-mono);">${escapeHtml(caseData.repair.patchTitle)}:</strong>
             <p style="font-family: var(--font-mono); font-size: 11px; color: var(--muted);">${escapeHtml(caseData.repair.patchText)}</p>
           </div>
         </div>
@@ -1221,12 +727,12 @@ function renderRightRail() {
         ${caseData.rightRail.phases
           .map((phase, index) => {
             const demoHeader = phase.id === "benchmark"
-              ? '<div class="rail-section-label">Demo Sandbox</div>'
+              ? '<div style="font-size: 0.75rem; color: #666; margin: 20px 0 8px 0; text-transform: uppercase; letter-spacing: 1px;">Demo Sandbox</div>'
               : "";
 
             return `
               ${demoHeader}
-              <a class="anchor-link ${index === 0 ? "active" : ""}" href="#" data-target="${escapeHtml(phase.id)}">
+              <a class="anchor-link ${index === 0 ? "active" : ""}" data-target="${escapeHtml(phase.id)}">
                 <span>${escapeHtml(phase.label)}</span>
               </a>
             `;
@@ -1245,16 +751,7 @@ function renderRightRail() {
       <h3>${escapeHtml(caseData.rightRail.failureModesTitle)}</h3>
       <div class="panel-tools">${renderPills(caseData.rightRail.failureModes)}</div>
     </div>
-    <div class="rail-card history-card">
-      <div class="history-header">
-        <h3>Recent Audits</h3>
-        <button id="btn-clear-history" class="history-clear" type="button">Clear History</button>
-      </div>
-      <div class="history-list" id="auditHistoryList"></div>
-    </div>
   `;
-
-  renderHistoryRail();
 }
 
 function renderApp() {
@@ -1346,6 +843,7 @@ function bindActions() {
     const diagnoseBtn = document.getElementById("btn-run-diagnose");
     const repairBtn = document.getElementById("btn-run-repair");
     const copyRepairBtn = document.getElementById("btn-copy-repair");
+    const toggleBtn = document.getElementById("btn-toggle-compare");
 
     if (inputDiagnoseBtn) {
       inputDiagnoseBtn.onclick = async () => {
@@ -1374,112 +872,161 @@ function bindActions() {
       copyRepairBtn.onclick = copyAfterOutput;
     }
 
-    bindHistoryActions();
+    if (toggleBtn) {
+      toggleBtn.onclick = toggleCompare;
+    }
   }, 0);
 }
 
 function clampScore(value) {
-  return Math.max(1, Math.min(5, Math.round(value)));
+  return Math.max(0, Math.min(10, value));
 }
 
 function getScoreExplanation(label, score) {
-  const anchors = {
-    1: "1/5 Unacceptable: Major fidelity failure; substantial revision required before portfolio use.",
-    2: "2/5 Poor: The output has a visible fidelity risk and requires written justification.",
-    3: "3/5 Adequate: Usable but needs targeted editing.",
-    4: "4/5 Good: Mostly aligned with minor improvements needed.",
-    5: "5/5 Excellent: Strong fidelity; requires justification in portfolio."
+  const templates = {
+    "Claim Accuracy": {
+      low: "The draft risks saying more than the source supports or blurring core findings.",
+      mid: "The main claim is mostly aligned, but key wording should be tightened against the source.",
+      high: "The claim tracks the source accurately and keeps the main finding intact."
+    },
+    "Causal Precision": {
+      low: "Causal language appears stronger than the evidence allows.",
+      mid: "Some causal caution is present, but the draft should distinguish association from proof more clearly.",
+      high: "Causal strength is framed carefully and matches the evidence type."
+    },
+    "Scope Fidelity": {
+      low: "The draft drops important population, setting, or time boundaries.",
+      mid: "Some scope cues are present, but transfer limits need to be more visible.",
+      high: "Scope conditions are clear enough to prevent overgeneralization."
+    },
+    "Method Transparency": {
+      low: "The method or evidence type is missing, which can inflate reader certainty.",
+      mid: "The evidence basis is hinted at, but the method signal should be easier to see.",
+      high: "The draft gives readers enough method context to interpret the claim."
+    },
+    "Nuance Preservation": {
+      low: "Important qualifications or conditional findings have been flattened.",
+      mid: "The draft preserves some nuance, but conditional language could be stronger.",
+      high: "Nuance, limitations, and conditional findings remain visible."
+    },
+    "Audience Calibration": {
+      low: "The draft does not fit the intended practitioner audience's decision context.",
+      mid: "The audience fit is workable, but the payoff could be more specific.",
+      high: "The draft is well tuned to the audience and their use case."
+    },
+    Actionability: {
+      low: "The next step is missing, vague, or not supported by the evidence.",
+      mid: "The draft offers a usable next step, but it should be more bounded and audience-specific.",
+      high: "The action cue is clear, useful, and appropriately limited by the evidence."
+    },
+    Clarity: {
+      low: "The message is too dense, which may increase cognitive load and reduce readability.",
+      mid: "The message is generally clear, but could be simplified for faster scanning.",
+      high: "The message is clear and well-paced, making it easy to grasp key ideas quickly."
+    },
+    Engagement: {
+      low: "The opening lacks a strong hook, which may reduce initial engagement.",
+      mid: "The content has moderate engagement, but could benefit from stronger emotional or contrast elements.",
+      high: "The content maintains attention well with a strong and engaging flow."
+    },
+    Structure: {
+      low: "The structure is unclear, making it difficult for readers to follow the information.",
+      mid: "The structure is acceptable, but transitions and segmentation could be improved.",
+      high: "The structure is clear and well-organized, supporting easy navigation."
+    },
+    Credibility: {
+      low: "The content lacks strong evidence signals, reducing perceived credibility.",
+      mid: "Some credibility signals are present, but more data or references could strengthen trust.",
+      high: "Strong use of data and evidence enhances credibility and trust."
+    },
+    "Visual Impact": {
+      low: "The content lacks visual hierarchy, making it harder to scan quickly.",
+      mid: "There is some visual structure, but it could be more defined.",
+      high: "The content has strong visual rhythm and is easy to scan."
+    },
+    "CTA Strength": {
+      low: "The call-to-action is unclear, leaving the reader without a next step.",
+      mid: "There is some action guidance, but it could be more direct and compelling.",
+      high: "The call-to-action is clear and effectively guides the reader."
+    },
+    "Audience Fit": {
+      low: "The content does not align well with the target audience's needs.",
+      mid: "The content partially matches the audience, but could be more tailored.",
+      high: "The content is well-aligned with the target audience and their expectations."
+    }
   };
 
-  const dimensionNotes = {
-    "Claim Accuracy": "Check whether the claim stays within what the source evidence supports.",
-    "Causal Precision": "Check whether causal strength matches the research design and wording.",
-    "Scope Fidelity": "Check whether population, setting, context, or time boundaries remain visible.",
-    "Method Transparency": "Check whether the method or evidence type is clear enough for interpretation.",
-    "Nuance Preservation": "Check whether limitations, caveats, and uncertainty are preserved.",
-    "Audience Calibration": "Check whether the output is tuned to the named reader and use case.",
-    Actionability: "Check whether the next step is realistic, bounded, and evidence-aligned."
-  };
+  const group = templates[label];
+  if (!group) {
+    return "";
+  }
 
-  const anchor = anchors[clampScore(score)] || anchors[3];
-  const note = dimensionNotes[label];
-  return note ? `${anchor} ${note}` : anchor;
+  if (score <= 4) {
+    return group.low;
+  }
+
+  if (score <= 7) {
+    return group.mid;
+  }
+
+  return group.high;
 }
 
 function getOverallVerdict(averageScore) {
-  if (averageScore <= 2) {
+  if (averageScore <= 4) {
     return {
-      text: "Poor \u2014 substantial revision needed",
+      text: "Critical Improvement Needed",
       color: "var(--bad)"
     };
   }
 
-  if (averageScore <= 3) {
+  if (averageScore <= 7) {
     return {
-      text: "Adequate \u2014 targeted editing needed",
+      text: "Solid Foundation, Optimization Recommended",
       color: "var(--warn)"
     };
   }
 
-  if (averageScore <= 4) {
-    return {
-      text: "Good \u2014 minor revision needed",
-      color: "var(--good)"
-    };
-  }
-
   return {
-    text: "Excellent \u2014 portfolio-ready",
+    text: "High-Performing Output",
     color: "var(--good)"
   };
-}
-
-function getScoreColor(score) {
-  if (score <= 2) {
-    return "red";
-  }
-
-  if (score === 3) {
-    return "orange";
-  }
-
-  return score >= 5 ? "green" : "blue";
 }
 
 function buildRepairSuggestions(scoreMap) {
   const suggestionLibrary = [
     {
-      key: "claimAccuracy",
+      key: "clarity",
       label: "Claim Accuracy",
       build: () => "Improve Claim Accuracy: Tighten wording so the claim matches what the source actually says."
     },
     {
-      key: "causalPrecision",
+      key: "engagement",
       label: "Causal Precision",
       build: () => "Improve Causal Precision: Replace unsupported causal verbs with association or evidence-limited language."
     },
     {
-      key: "scopeFidelity",
+      key: "structure",
       label: "Scope Fidelity",
       build: () => "Improve Scope Fidelity: Restore the population, setting, time period, or boundary condition."
     },
     {
-      key: "methodTransparency",
+      key: "credibility",
       label: "Method Transparency",
       build: () => "Improve Method Transparency: Add a visible method or evidence signal such as survey, interview, experiment, or review."
     },
     {
-      key: "nuancePreservation",
+      key: "visual",
       label: "Nuance Preservation",
       build: () => "Improve Nuance Preservation: Keep limitations, conditional findings, and uncertainty visible."
     },
     {
-      key: "actionability",
+      key: "cta",
       label: "Actionability",
       build: () => "Improve Actionability: Add a concrete next step that is feasible for the intended practitioner audience."
     },
     {
-      key: "audienceCalibration",
+      key: "audience",
       label: "Audience Calibration",
       build: () => "Improve Audience Calibration: Rewrite key lines for the audience's role, constraints, and decision context."
     }
@@ -1490,7 +1037,7 @@ function buildRepairSuggestions(scoreMap) {
     .sort((a, b) => a.value - b.value);
 
   return ranked
-    .filter((item, index) => item.value <= 3 || index < 2)
+    .filter((item, index) => item.value < 7 || index < 2)
     .slice(0, 4)
     .map((item) => item.build());
 }
@@ -1515,16 +1062,16 @@ function generateLocalInsight(input, scoreMap) {
   }
 
   const weakDimension = Object.entries(scoreMap)
-    .sort((a, b) => a[1] - b[1])[0]?.[0] || "claimAccuracy";
+    .sort((a, b) => a[1] - b[1])[0]?.[0] || "structure";
 
   const repairMap = {
-    claimAccuracy: "Tighten the main claim so it stays closer to the source evidence.",
-    causalPrecision: "Downgrade causal language where the source does not establish causation.",
-    scopeFidelity: "Restore the relevant population, setting, or scope condition.",
-    methodTransparency: "Add a visible method signal so readers know how the evidence was produced.",
-    nuancePreservation: "Preserve limitations and conditional findings instead of flattening the nuance.",
-    audienceCalibration: "Rewrite key lines with a clearer audience payoff for practitioners.",
-    actionability: "Add a practical next step that stays within the evidence limits."
+    clarity: "Tighten the main claim so it stays closer to the source evidence.",
+    engagement: "Downgrade causal language where the source does not establish causation.",
+    structure: "Restore the relevant population, setting, or scope condition.",
+    credibility: "Add a visible method signal so readers know how the evidence was produced.",
+    visual: "Preserve limitations and conditional findings instead of flattening the nuance.",
+    cta: "Add a practical next step that stays within the evidence limits.",
+    audience: "Rewrite key lines with a clearer audience payoff for practitioners."
   };
 
   return {
@@ -1533,87 +1080,98 @@ function generateLocalInsight(input, scoreMap) {
   };
 }
 
-function includesAny(text, cues) {
-  return cues.some((cue) => cue instanceof RegExp ? cue.test(text) : text.includes(cue));
-}
-
-function countCueHits(text, cues) {
-  return cues.reduce((count, cue) => count + (cue instanceof RegExp ? Number(cue.test(text)) : Number(text.includes(cue))), 0);
-}
-
-function createFidelityScores(input) {
-  const text = String(input || "").trim();
+function generateDynamicScores(input) {
+  const base = simulateDiagnoseScores(input, caseData);
+  const text = input.trim();
   const lowerText = text.toLowerCase();
+  const sections = text.split(/\n\s*\n/).filter(Boolean).length;
+  const hasNumbers = /\d/.test(text);
+  const hasCTA = /(learn more|sign up|read more|download|contact|explore|apply|what to do|take away)/i.test(text);
+  const hasHook = /(\?|why it matters|here's the key|bottom line)/i.test(text);
+  const jitter = () => Math.floor(Math.random() * 3) - 1;
 
-  const overclaimCues = [/\balways\b/, /\bguarantees?\b/, /\bproves?\b/, /\bproven\b/, /\bsolves?\b/, /\beliminates?\b/, /\beveryone\b/, /\beverywhere\b/, /\bwill ensure\b/, /\bdefinitively\b/];
-  const evidenceLimitedCues = [/\bsuggests?\b/, /\bevidence suggests\b/, /\bassociated with\b/, /\bindicates?\b/, /\bmay\b/, /\bappears?\b/, /\bcould\b/, /\blinked to\b/];
-  const causalVerbCues = [/\bcauses?\b/, /\bleads to\b/, /\blead to\b/, /\bimproves?\b/, /\breduces?\b/, /\bincreases?\b/, /\bdrives?\b/, /\bresults in\b/, /\bboosts?\b/];
-  const causalDesignCues = [/\bexperiments?\b/, /\brandomized\b/, /\brandomised\b/, /\bcausal\b/, /\bfield experiment\b/];
-  const associationCues = [/\bassociated with\b/, /\blinked to\b/, /\bcorrelational\b/, /\bnot causal\b/, /\bnot proof\b/, /\bnot proof of causation\b/, /\bdoes not prove causation\b/];
-  const scopeCues = [/\bsample\b/, /\bpopulation\b/, /\bsetting\b/, /\bcontext\b/, /\bu\.s\./, /\bfederal\b/, /\blocal\b/, /\bcanadian\b/, /\bdanish\b/, /\btime period\b/, /\bworkforce\b/, /\bagency context\b/];
-  const overScopeCues = [/\ball agencies\b/, /\ball public agencies\b/, /\bevery government\b/, /\bevery agency\b/, /\buniversal\b/, /\beverywhere\b/];
-  const methodCues = [/\bsurveys?\b/, /\binterviews?\b/, /\bexperiments?\b/, /\bmeta-analysis\b/, /\bmeta analysis\b/, /\bsystematic review\b/, /\bqualitative\b/, /\bquantitative\b/, /\bmixed-method\b/, /\bmixed method\b/, /\bdata\b/, /\bdataset\b/, /\bregression\b/, /\badministrative records\b/, /\bcase study\b/];
-  const nuanceCues = [/\blimitations?\b/, /\bcaveats?\b/, /\bhowever\b/, /\bmay\b/, /\bcould\b/, /\bvaries\b/, /\bcontext\b/, /\bnot proof\b/, /\bconditional\b/, /\buncertainty\b/, /\bdepends\b/];
-  const audienceCues = [/\bpolicymakers\b/, /\bpolicy makers\b/, /\bpractitioners\b/, /\bagency leaders\b/, /\bpublic managers\b/, /\banalysts\b/, /\bcitizens\b/, /\bdecision-makers\b/, /\bdecision makers\b/, /\bprogram leads\b/, /\bagency executives\b/];
-  const academicOnlyCues = [/\bp-value\b/, /\bregression coefficient\b/, /\btheoretical contribution\b/, /\bliterature gap\b/, /\bmodel specification\b/];
-  const actionCues = [/\bpilot\b/, /\breview\b/, /\bconsider\b/, /\btest\b/, /\badapt\b/, /\bnext step\b/, /\brecommend\b/, /\brecommendation\b/, /\bdiagnostic\b/, /\buse the finding\b/, /\bmonitor\b/, /\bassess\b/, /\bevaluate\b/];
-  const recklessActionCues = [/\bmust immediately\b/, /\bshould immediately\b/, /\bevery agency should\b/, /\bevery government should\b/, /\ball agencies should\b/, /\buniversal solution\b/, /\badopt this solution immediately\b/];
+  const scoreMap = {
+    clarity: clampScore(Math.max(4, Math.min(9, base.clarity + jitter()))),
+    engagement: clampScore(Math.max(4, Math.min(9, base.engagement + (hasHook ? 1 : 0) + jitter()))),
+    structure: clampScore(Math.max(4, Math.min(9, base.structure + (sections >= 2 ? 1 : 0) + jitter()))),
+    credibility: clampScore(Math.max(4, Math.min(9, base.credibility + (hasNumbers ? 1 : 0) + jitter()))),
+    visual: clampScore(Math.max(4, Math.min(9, base.visual + (sections >= 3 ? 1 : 0) + jitter()))),
+    cta: clampScore(Math.max(4, Math.min(9, base.cta + (hasCTA ? 2 : 0) + jitter()))),
+    audience: clampScore(Math.max(4, Math.min(9, base.audience + ((lowerText.includes("policy") || lowerText.includes("practitioner")) ? 1 : 0) + jitter())))
+  };
 
-  const overclaimCount = countCueHits(lowerText, overclaimCues);
-  const evidenceLimitedCount = countCueHits(lowerText, evidenceLimitedCues);
-  const causalVerbCount = countCueHits(lowerText, causalVerbCues);
-  const hasCausalDesign = includesAny(lowerText, causalDesignCues);
-  const associationCount = countCueHits(lowerText, associationCues);
-  const scopeCount = countCueHits(lowerText, scopeCues);
-  const overScopeCount = countCueHits(lowerText, overScopeCues);
-  const methodCount = countCueHits(lowerText, methodCues);
-  const nuanceCount = countCueHits(lowerText, nuanceCues);
-  const audienceCount = countCueHits(lowerText, audienceCues);
-  const actionCount = countCueHits(lowerText, actionCues);
-  const hasRecklessAction = includesAny(lowerText, recklessActionCues);
+  return scoreMap;
+}
 
-  let claimAccuracy = 3;
-  if (overclaimCount > 0) claimAccuracy -= Math.min(2, overclaimCount);
-  if (evidenceLimitedCount > 0) claimAccuracy += evidenceLimitedCount >= 2 ? 2 : 1;
-  if (text.length < 40) claimAccuracy -= 1;
+function simulateDiagnoseScores(input, data) {
+  const text = input.trim();
+  const lowerText = text.toLowerCase();
+  const sections = text
+    .split(/\n\s*\n/)
+    .map((section) => section.trim())
+    .filter(Boolean);
+  const bulletCount = (text.match(/(^|\n)\s*([-*]|\d+\.)\s+/g) || []).length;
+  const sentenceCount = (text.match(/[.!?]+/g) || []).length;
+  const numberCount = (text.match(/\d+/g) || []).length;
+  const ctaKeywords = ["learn more", "sign up", "read more", "try", "download", "contact", "explore", "act now"];
+  const audienceKeywords = ["policy", "practitioner", "analyst", "public", "government", "leader", "decision"];
+  const visualKeywords = ["slide", "carousel", "step", "key takeaway", "why it matters", "bottom line"];
+  const credibilityKeywords = ["study", "data", "survey", "evidence", "research", "sample", "federal"];
 
-  let causalPrecision = 3;
-  if (causalVerbCount > 0 && !hasCausalDesign) causalPrecision -= causalVerbCount >= 2 ? 2 : 1;
-  if (hasCausalDesign && causalVerbCount > 0) causalPrecision += 1;
-  if (associationCount > 0) causalPrecision += associationCount >= 2 ? 2 : 1;
+  let clarity = 5;
+  if (text.length < 50) clarity -= 2;
+  if (text.length >= 80 && text.length <= 500) clarity += 2;
+  if (sentenceCount > 0 && text.length / sentenceCount < 160) clarity += 1;
+  if (text.length > 900) clarity -= 1;
 
-  let scopeFidelity = 3;
-  if (scopeCount > 0) scopeFidelity += scopeCount >= 2 ? 2 : 1;
-  if (overScopeCount > 0) scopeFidelity -= overScopeCount >= 2 ? 2 : 1;
-  if (scopeCount === 0 && text.length > 120) scopeFidelity -= 1;
+  let engagement = 4;
+  if (text.includes("?")) engagement += 2;
+  if (visualKeywords.some((keyword) => lowerText.includes(keyword))) engagement += 2;
+  if (lowerText.includes("why it matters") || lowerText.includes("here's the key")) engagement += 1;
+  if (text.length < 50) engagement -= 1;
 
-  let methodTransparency = 3;
-  if (methodCount > 0) methodTransparency += methodCount >= 2 ? 2 : 1;
-  if (methodCount === 0) methodTransparency -= 1;
+  let structure = 3;
+  if (sections.length >= 3) structure += 3;
+  if (bulletCount >= 2) structure += 2;
+  if (visualKeywords.some((keyword) => lowerText.includes(keyword))) structure += 1;
+  if (sections.length <= 1 && bulletCount === 0) structure -= 1;
 
-  let nuancePreservation = 3;
-  if (nuanceCount > 0) nuancePreservation += nuanceCount >= 2 ? 2 : 1;
-  if ((overclaimCount > 0 || overScopeCount > 0) && nuanceCount === 0) nuancePreservation -= 1;
-  if (nuanceCount === 0 && text.length > 120) nuancePreservation -= 1;
+  let credibility = 4;
+  if (numberCount > 0) credibility += 2;
+  if (credibilityKeywords.some((keyword) => lowerText.includes(keyword))) credibility += 2;
+  if (lowerText.includes("correlational") || lowerText.includes("not proof of causation") || lowerText.includes("limitation")) credibility += 1;
 
-  let audienceCalibration = 3;
-  if (audienceCount > 0) audienceCalibration += audienceCount >= 2 ? 2 : 1;
-  if (audienceCount === 0 && includesAny(lowerText, academicOnlyCues)) audienceCalibration -= 1;
-  if (text.length < 50) audienceCalibration -= 1;
+  let visual = 3;
+  if (sections.length >= 4) visual += 3;
+  if (bulletCount >= 3) visual += 2;
+  if (visualKeywords.some((keyword) => lowerText.includes(keyword))) visual += 2;
 
-  let actionability = 3;
-  if (actionCount > 0) actionability += actionCount >= 2 ? 2 : 1;
-  if (actionCount === 0) actionability -= 1;
-  if (hasRecklessAction) actionability -= 2;
+  let cta = 2;
+  if (ctaKeywords.some((keyword) => lowerText.includes(keyword))) cta += 5;
+  if (lowerText.includes("what practitioners can take away") || lowerText.includes("what to do")) cta += 2;
+  if (lowerText.includes("focus on") || lowerText.includes("should")) cta += 1;
+
+  let audience = 4;
+  if (audienceKeywords.some((keyword) => lowerText.includes(keyword))) audience += 2;
+  if (data.audience.cards.some((card) => {
+    const title = card.title || card.outputType || "";
+    const description = card.description || card.audience || "";
+    const firstWord = description.split(" ")[0] || "";
+    return (title && lowerText.includes(title.toLowerCase())) || (firstWord && lowerText.includes(firstWord.toLowerCase()));
+  })) {
+    audience += 1;
+  }
+  if (lowerText.includes("policy") || lowerText.includes("practitioner")) audience += 1;
+  if (text.length > 900) audience -= 1;
 
   return {
-    claimAccuracy: clampScore(claimAccuracy),
-    causalPrecision: clampScore(causalPrecision),
-    scopeFidelity: clampScore(scopeFidelity),
-    methodTransparency: clampScore(methodTransparency),
-    nuancePreservation: clampScore(nuancePreservation),
-    audienceCalibration: clampScore(audienceCalibration),
-    actionability: clampScore(actionability)
+    clarity: clampScore(clarity),
+    engagement: clampScore(engagement),
+    structure: clampScore(structure),
+    credibility: clampScore(credibility),
+    visual: clampScore(visual),
+    cta: clampScore(cta),
+    audience: clampScore(audience)
   };
 }
 
@@ -1628,15 +1186,14 @@ async function renderDiagnoseResults(scoreRows, insightText, repairText, scoreMa
     const verdict = getOverallVerdict(averageScore);
     scoresBox.innerHTML = scoreRows
       .map((score) => {
-        const width = `${(score.value / 5) * 100}%`;
-        const color = getScoreColor(score.value);
+        const width = `${score.value * 10}%`;
         return `
           <div style="margin-bottom: 16px;">
             <div class="score-row" style="margin-bottom: 6px;">
               <span>${escapeHtml(score.label)}</span>
               <div>
-                <div class="bar"><div class="fill ${escapeHtml(color)}" style="width: ${width}"></div></div>
-                ${escapeHtml(`${score.value}/5`)}
+                <div class="bar"><div class="fill blue" style="width: ${width}"></div></div>
+                ${escapeHtml(`${score.value}/10`)}
               </div>
             </div>
             <p id="score-expl-${escapeHtml(score.label.toLowerCase().replace(/\s+/g, "-"))}" style="margin: 0; color: var(--muted); font-size: 12px; line-height: 1.5; min-height: 18px;"></p>
@@ -1664,7 +1221,7 @@ async function renderDiagnoseResults(scoreRows, insightText, repairText, scoreMa
   }
 
   if (liveScore) {
-    liveScore.textContent = "1\u20135 Fidelity Demo Score | Anchor-based QA";
+    liveScore.textContent = `Demo Score -> Audience:${scoreMap.audience} | Action:${scoreMap.cta} | Scope:${scoreMap.structure} | Method:${scoreMap.credibility}`;
   }
 
   if (aiWhyLowScore) {
@@ -1679,8 +1236,6 @@ async function renderDiagnoseResults(scoreRows, insightText, repairText, scoreMa
 async function runDiagnose() {
   const inputElement = document.getElementById("userInput");
   const input = inputElement ? inputElement.value.trim() : "";
-  const selectedOutputType = document.getElementById("outputTypeSelect")?.value || "Policy Brief";
-  const profile = outputTypeProfiles[selectedOutputType];
   const diagnoseButton = document.getElementById("btn-run-diagnose");
   const scoresBox = document.getElementById("diagnoseScores");
   const resultBox = document.getElementById("diagnoseResult");
@@ -1693,11 +1248,11 @@ async function runDiagnose() {
     return false;
   }
 
+  const isTryYourOwnMode = document.querySelector(".panel.active")?.id === "try-your-own";
+
   showPanel("diagnose");
   caseData.text = input;
   caseData.repair.beforeText = input;
-
-  renderSelectedOutputTypeMeta(selectedOutputType, profile);
 
   const beforeOutput = document.getElementById("beforeOutput");
   if (beforeOutput) {
@@ -1711,7 +1266,7 @@ async function runDiagnose() {
   }
 
   if (scoresBox) {
-    scoresBox.innerHTML = `<p style="color: var(--muted); margin: 0;">Analyzing fidelity cues...</p>`;
+    scoresBox.innerHTML = `<p style="color: var(--muted); margin: 0;">Analyzing content structure...</p>`;
   }
 
   if (resultBox) {
@@ -1732,68 +1287,61 @@ async function runDiagnose() {
   }
 
   if (aiWhyLowScore) {
-    aiWhyLowScore.textContent = "Preparing rule-based assessment...";
+    aiWhyLowScore.textContent = "Generating demo analysis...";
   }
 
   if (aiRepairPatch) {
-    aiRepairPatch.textContent = "Preparing repair notes...";
+    aiRepairPatch.textContent = "Preparing strategic repair patch...";
   }
 
   try {
     if (scoresBox) {
-      scoresBox.innerHTML = `<p style="color: var(--muted); margin: 0;">Analyzing fidelity anchors...</p>`;
+      scoresBox.innerHTML = `<p style="color: var(--muted); margin: 0;">Analyzing structure...</p>`;
     }
     await wait(600);
 
     if (scoresBox) {
-      scoresBox.innerHTML = `<p style="color: var(--muted); margin: 0;">Evaluating course dimensions...</p>`;
+      scoresBox.innerHTML = `<p style="color: var(--muted); margin: 0;">Evaluating audience fit...</p>`;
     }
     await wait(600);
 
     const issues = [];
     const lowerInput = input.toLowerCase();
-    const scores = createFidelityScores(input);
+    const localScoreMap = isTryYourOwnMode
+      ? generateDynamicScores(input)
+      : simulateDiagnoseScores(input, caseData);
 
-    if (scores.actionability <= 3) {
+    if (!lowerInput.includes("should") && !lowerInput.includes("next step") && !lowerInput.includes("practitioner")) {
       issues.push("weak_actionability");
     }
 
-    if (scores.nuancePreservation <= 3 && !lowerInput.includes("limitation") && !lowerInput.includes("limit")) {
+    if (!lowerInput.includes("limitation") && !lowerInput.includes("limit")) {
       issues.push("missing_limitation");
     }
 
-    if (scores.scopeFidelity <= 3) {
-      issues.push("scope_fidelity_gap");
+    if (localScoreMap.structure <= 4) {
+      issues.push("scope_or_structure_gap");
     }
 
-    if (scores.methodTransparency <= 2) {
-      issues.push("method_omission");
-    }
-
-    if (scores.causalPrecision <= 2) {
-      issues.push("causal_precision_risk");
-    }
-
-    if (scores.audienceCalibration <= 3) {
+    if (localScoreMap.audience <= 5) {
       issues.push("weak_audience_calibration");
     }
 
+    const scoreMap = localScoreMap;
     const scoreRows = [
-      { label: "Claim Accuracy", value: scores.claimAccuracy },
-      { label: "Causal Precision", value: scores.causalPrecision },
-      { label: "Scope Fidelity", value: scores.scopeFidelity },
-      { label: "Method Transparency", value: scores.methodTransparency },
-      { label: "Nuance Preservation", value: scores.nuancePreservation },
-      { label: "Audience Calibration", value: scores.audienceCalibration },
-      { label: "Actionability", value: scores.actionability }
+      { label: "Claim Accuracy", value: scoreMap.clarity },
+      { label: "Causal Precision", value: scoreMap.engagement },
+      { label: "Scope Fidelity", value: scoreMap.structure },
+      { label: "Method Transparency", value: scoreMap.credibility },
+      { label: "Nuance Preservation", value: scoreMap.visual },
+      { label: "Audience Calibration", value: scoreMap.audience },
+      { label: "Actionability", value: scoreMap.cta }
     ];
 
     latestDiagnoseState = {
       input,
-      outputType: selectedOutputType,
-      profile,
       issues: [...issues],
-      scores: { ...scores },
+      scores: { ...scoreMap },
       rows: scoreRows
     };
 
@@ -1810,16 +1358,15 @@ async function runDiagnose() {
 
       live.style.whiteSpace = "pre-wrap";
       const issueList = latestDiagnoseState.issues;
-      const issueText = `Rule-based flags: ${issueList.length ? issueList.join(", ") : "None"}`;
+      const issueText = `Demo issues: ${issueList.length ? issueList.join(", ") : "None"}`;
       await typeWriter(live, issueText, 12);
     }
 
-    const fallback = generateLocalInsight(input, scores);
+    const fallback = generateLocalInsight(input, scoreMap);
     const insightText = fallback.insight;
     const repairText = fallback.repair;
 
-    await renderDiagnoseResults(scoreRows, insightText, repairText, scores);
-    latestDiagnoseState.historyRecordId = saveDiagnoseHistoryRecord(latestDiagnoseState);
+    await renderDiagnoseResults(scoreRows, insightText, repairText, scoreMap);
   } finally {
     if (diagnoseButton) {
       diagnoseButton.disabled = false;
@@ -1832,8 +1379,6 @@ async function runDiagnose() {
 
 async function generateRepair() {
   const input = document.getElementById("userInput")?.value.trim() || "";
-  const selectedOutputType = document.getElementById("outputTypeSelect")?.value || "Policy Brief";
-  const profile = outputTypeProfiles[selectedOutputType];
   const beforeOutput = document.getElementById("beforeOutput");
   const outputBox = document.getElementById("afterOutput");
   const repairButton = document.getElementById("btn-run-repair");
@@ -1861,24 +1406,14 @@ async function generateRepair() {
   }
 
   try {
-    outputBox.textContent = "Drafting local repair suggestions...";
+    outputBox.textContent = "Generating strategic repair patches...";
     await wait(1200);
 
-    const activeScores = latestDiagnoseState ? latestDiagnoseState.scores : createFidelityScores(input);
+    const activeScores = latestDiagnoseState ? latestDiagnoseState.scores : simulateDiagnoseScores(input, caseData);
     const suggestions = buildRepairSuggestions(activeScores);
-    const repaired = [
-      `Output Type: ${selectedOutputType}`,
-      `Repair Focus: ${profile.repairFocus}`,
-      "",
-      `Format Check: This draft should include ${profile.mustInclude}.`,
-      "",
-      "Suggestions:",
-      "",
-      ...suggestions.map((suggestion) => `* ${suggestion}`)
-    ].join("\n");
+    const repaired = ["Suggestions:", "", ...suggestions.map((suggestion) => `* ${suggestion}`)].join("\n");
 
     await typeWriter(outputBox, repaired, 10);
-    updateLatestHistoryRepair(repaired);
   } finally {
     if (repairButton) {
       repairButton.disabled = false;
@@ -1931,6 +1466,23 @@ function fallbackCopyText(text) {
   document.body.removeChild(textarea);
 }
 
+function toggleCompare() {
+  const before = document.getElementById("before");
+  const after = document.getElementById("after");
+
+  if (!before || !after) {
+    return;
+  }
+
+  const beforeActive = before.classList.toggle("before-state");
+  const afterActive = after.classList.toggle("after-state");
+
+  if (!beforeActive && !afterActive) {
+    before.classList.add("before-state");
+    after.classList.add("after-state");
+  }
+}
+
 document.addEventListener("DOMContentLoaded", () => {
   renderApp();
 
@@ -1944,3 +1496,4 @@ window.showPanel = showPanel;
 window.switchTab = showPanel;
 window.runDiagnose = runDiagnose;
 window.generateRepair = generateRepair;
+window.toggleCompare = toggleCompare;
