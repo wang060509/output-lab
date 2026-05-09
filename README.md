@@ -1,57 +1,128 @@
 # Output Lab
-## 在线预览
 
-[点击查看 Output Lab 在线演示](https://wang060509.github.io/output-lab/)
+Output Lab is an output-level QA and repair interface inside the AI Playbook workflow, designed to check and improve already-generated practitioner-ready research translation output drafts.
 
-一个面向 AI 生成内容的质量检查工具，用于帮助用户识别文本中的证据不足、逻辑跳跃、范围漂移和行动建议风险。
+## What This Project Is
 
-## 项目定位
+- A demo-only static frontend
+- Built with HTML, CSS, and JavaScript
+- A rule-based fidelity QA prototype
+- A course-aligned research translation QA interface
+- A lightweight tool for diagnosing and repairing output-level fidelity risks
 
-Output Lab 关注的是 AI 输出内容的“可用性”和“可信度”，适合用于政策简报、研究摘要、会议材料、备忘录、课程资料整理等文本场景。
+## What This Project Is Not
 
-它不是简单的写作工具，而是一个帮助用户检查 AI 内容质量的辅助工具。
+- A full paper analyzer
+- A paper generator
+- An API demo
+- A replacement for human fidelity judgment
+- A source verification engine
+- A tool that directly verifies claims against uploaded academic papers
 
-## 核心功能
+## Course Alignment
 
-- 检查文本中可能存在的证据不足问题
-- 提醒逻辑跳跃、因果夸大或范围漂移
-- 标记行动建议中可能存在的风险
-- 帮助用户重新审视 AI 生成内容是否适合直接使用
+Output Lab supports the AI Playbook project by focusing on the QA and repair stage of practitioner-ready research translation. It helps users examine whether a generated draft preserves research meaning while becoming useful for applied public administration audiences.
 
-## 使用场景
+The project aligns with the course requirements by supporting:
 
-- 政策简报初稿检查
-- 会议纪要和行动项复核
-- 研究资料摘要质量检查
-- AI 生成报告的二次审查
-- 办公文档写作辅助
+- Practitioner-ready research translation
+- Research fidelity
+- Seven fidelity dimensions
+- Eighteen output types
+- Failure mode documentation
+- Repair loop design
+- Consistency analysis support
+- Responsible AI use in public administration contexts
 
-## 项目亮点
+Output Lab does not attempt to cover the entire research translation pipeline. It is designed specifically for reviewing and improving output drafts after an initial translation has already been generated.
 
-- 面向真实办公和研究场景
-- 适合非技术用户使用
-- 展示了 AI 工具使用、产品思维和文本分析能力
-- 可继续扩展为 Excel/CSV 清洗、会议纪要提取、申请材料管理等办公自动化工具
+## Core Features
 
-## 技术栈
+- **Output Type Selector:** Lets users choose the format they want to audit, such as a policy brief, executive summary, Q&A guide, or LinkedIn carousel.
+- **1-5 Fidelity Scoring:** Provides heuristic scores across fidelity dimensions to help users identify stronger and weaker areas of a draft.
+- **Diagnose:** Runs a rule-based review of the pasted draft and flags likely fidelity risks.
+- **Repair:** Generates a bounded repair draft that reduces common output-level risks without claiming to verify the original source.
+- **Copy Repaired Output:** Allows users to quickly copy the revised draft for further editing or review.
+- **Failure Mode Library:** Documents recurring risks such as overstated causality, missing scope limits, weak method transparency, and audience mismatch.
+- **Output Type Standards:** Shows expectations and risk patterns for different practitioner-facing output formats.
+- **Recent Audits / localStorage History:** Saves recent audit records in the user's browser so earlier checks can be revisited during the same workflow.
+
+## Fidelity Dimensions
+
+- Claim Accuracy
+- Causal Precision
+- Scope Fidelity
+- Method Transparency
+- Nuance Preservation
+- Audience Calibration
+- Actionability
+
+These dimensions are used to evaluate whether a translated output preserves research meaning while becoming clear, useful, and appropriately calibrated for practitioner audiences.
+
+## Supported Output Types
+
+- Policy Brief
+- Policy Memo
+- Executive Summary
+- Q&A Guide
+- Fact Sheet
+- Plain Language Explainer
+- Op-Ed
+- Letter to the Editor
+- Press Release
+- Elevator Pitch
+- Report Outline
+- Technical Note
+- Infographic Brief
+- Video Script
+- LinkedIn Post
+- LinkedIn Carousel
+- Position Article
+- Mechanism Map
+
+## How It Works
+
+1. User selects an output type.
+2. User pastes a generated research translation draft.
+3. The tool runs a rule-based fidelity diagnosis.
+4. The tool identifies likely failure modes and output-specific risks.
+5. The tool generates a bounded repair draft and saves the audit record in browser history.
+
+## How To Run
+
+- Open `index.html` directly in a browser.
+- No API key required.
+- No local server required.
+- No installation required.
+
+## Technical Stack
 
 - HTML
 - CSS
 - JavaScript
-- Git / GitHub
+- localStorage
 
-## 当前状态
+## Current Limitations
 
-这是我的第一个 AI 辅助编程作品集项目，目前处于持续完善阶段。
+- Rule-based demo only
+- Does not read full academic papers
+- Does not verify claims against source PDFs
+- Does not replace human review
+- Scores are heuristic, not authoritative
+- Repair output is a demo repair, not a verified final answer
+- localStorage history stays only in the user's browser
+- No backend, database, or API integration
 
-后续计划：
+## Future Roadmap
 
-- 优化页面结构和交互体验
-- 增加示例文本和演示流程
-- 补充项目截图
-- 部署 GitHub Pages 在线预览
-- 整理为作品集网站中的第一个案例
+- Add structured scoring justification notes
+- Add exportable audit summaries
+- Support master fidelity matrix preparation
+- Connect to structured source extraction
+- Add safer backend/API integration later
+- Deploy to GitHub Pages, Netlify, or Vercel
+- Create a separate Chinese portfolio version after the course presentation
 
-## 项目说明
+## Portfolio Value
 
-本项目聚焦 AI 生成内容的质量审查场景，尝试将文本分析、风险提示和办公文档处理结合起来，探索 AI 辅助工作的实际应用价值。
+Output Lab demonstrates the ability to turn course requirements into a working prototype that is useful, bounded, and honest about its limitations. It reflects AI workflow design, research fidelity awareness, public administration evidence translation, responsible AI use, product thinking, frontend implementation with AI coding tools, and the translation of an academic assignment into an early-stage portfolio project.
