@@ -1,4 +1,7 @@
 # Output Lab
+## 在线预览
+
+[点击查看 Output Lab 在线演示](https://wang060509.github.io/output-lab/)
 
 一个面向 AI 生成内容的质量检查工具，用于帮助用户识别文本中的证据不足、逻辑跳跃、范围漂移和行动建议风险。
 
