@@ -728,7 +728,8 @@ function saveDiagnoseHistoryRecord(state) {
     issues: [...state.issues],
     overallAverage,
     overallVerdict: overallVerdict.text,
-    profile: getAuditProfile(state.profile)
+    profile: getAuditProfile(state.profile),
+    scoreJustifications: state.scoreJustifications || {}
   };
   const history = readAuditHistory().filter((item) => item.id !== id);
 
@@ -787,6 +788,14 @@ function restoreAuditRecord(recordId) {
     ? Number(record.overallAverage)
     : getAverageScore(scoreRows);
   const verdict = getOverallVerdict(overallAverage);
+  
+  // Restore or generate scoreJustifications (with fallback for old records)
+  let scoreJustifications = record.scoreJustifications;
+  if (!scoreJustifications || typeof scoreJustifications !== "object" || Object.keys(scoreJustifications).length === 0) {
+    // Fallback: generate justifications from saved scores for old records
+    scoreJustifications = createScoreJustifications(input, record.scores || {}, outputType, profile);
+  }
+  
   const inputElement = document.getElementById("userInput");
   const outputTypeSelect = document.getElementById("outputTypeSelect");
   const beforeOutput = document.getElementById("beforeOutput");
@@ -822,15 +831,28 @@ function restoreAuditRecord(recordId) {
   }
 
   if (scoresBox) {
+    const scoreLabelsToKeys = {
+      "Claim Accuracy": "claimAccuracy",
+      "Causal Precision": "causalPrecision",
+      "Scope Fidelity": "scopeFidelity",
+      "Method Transparency": "methodTransparency",
+      "Nuance Preservation": "nuancePreservation",
+      "Audience Calibration": "audienceCalibration",
+      "Actionability": "actionability"
+    };
+    
     scoresBox.innerHTML = `
       <div style="margin-bottom: 16px;">
         <p style="margin: 0 0 6px; font-size: 12px; color: var(--muted); font-family: var(--font-mono); text-transform: uppercase;">Overall Verdict</p>
         <p id="diagnoseVerdict" style="margin: 0; font-weight: 700; color: ${verdict.color}; min-height: 20px;">${escapeHtml(verdict.text)}</p>
+        <button id="btn-copy-audit-summary" class="action secondary" type="button" style="margin-top: 8px;">Copy Audit Summary</button>
       </div>
       ${scoreRows
         .map((score) => {
           const width = `${(score.value / 5) * 100}%`;
           const color = getScoreColor(score.value);
+          const justificationKey = scoreLabelsToKeys[score.label];
+          const justification = justificationKey ? (scoreJustifications[justificationKey] || getScoreExplanation(score.label, score.value)) : getScoreExplanation(score.label, score.value);
           return `
             <div style="margin-bottom: 16px;">
               <div class="score-row" style="margin-bottom: 6px;">
@@ -840,7 +862,7 @@ function restoreAuditRecord(recordId) {
                   ${escapeHtml(`${score.value}/5`)}
                 </div>
               </div>
-              <p style="margin: 0; color: var(--muted); font-size: 12px; line-height: 1.5; min-height: 18px;">${escapeHtml(getScoreExplanation(score.label, score.value))}</p>
+              <p style="margin: 0; color: var(--muted); font-size: 12px; line-height: 1.5; min-height: 18px;">${escapeHtml(justification)}</p>
             </div>
           `;
         })
@@ -873,10 +895,13 @@ function restoreAuditRecord(recordId) {
     scores: { ...(record.scores || {}) },
     rows: scoreRows,
     historyRecordId: record.id,
-    repairText: record.repairText || ""
+    repairText: record.repairText || "",
+    scoreJustifications
   };
 
   showPanel("diagnose");
+
+  bindActions();
 }
 
 function bindHistoryActions() {
@@ -1343,6 +1368,7 @@ function bindActions() {
   setTimeout(() => {
     const inputDiagnoseBtn = document.getElementById("btn-run-diagnose-input");
     const exploreSampleBtn = document.getElementById("btn-explore-sample");
+    const fillSampleBtn = document.getElementById("btn-fill-sample");
     const diagnoseBtn = document.getElementById("btn-run-diagnose");
     const repairBtn = document.getElementById("btn-run-repair");
     const copyRepairBtn = document.getElementById("btn-copy-repair");
@@ -1362,6 +1388,15 @@ function bindActions() {
       };
     }
 
+    if (fillSampleBtn) {
+      fillSampleBtn.onclick = () => {
+        const userInput = document.getElementById("userInput");
+        if (userInput) {
+          userInput.value = "Policy Brief: Enhancing Productivity Through New Initiatives\n\nIntroduction:\nIn an effort to improve operational efficiency, a new policy has been proposed based on emerging research findings. This brief outlines the key recommendations and expected outcomes.\n\nBackground:\nA comprehensive study conducted in various organizational settings revealed promising results regarding productivity enhancements. Participants in the pilot program reported substantial improvements in their daily workflows.\n\nKey Findings:\n- Efficiency gains of up to 30% were observed among test groups.\n- Reduction in administrative overhead by approximately 20%.\n- Increased satisfaction levels among staff members.\n\nRecommendations:\nIt is strongly advised that all relevant departments implement this policy without delay. The broad application of these measures will lead to widespread benefits for the entire organization. Responsible parties should prioritize quick adoption to maximize impact.\n\nPotential Challenges:\nWhile the evidence supports positive changes, some uncertainties remain regarding long-term sustainability. Timeline for full implementation is flexible, depending on departmental readiness.\n\nConclusion:\nAdopting this policy will undoubtedly transform our approach to productivity, leading to better outcomes for all stakeholders. Further monitoring and evaluation will be necessary to refine the process.";
+        }
+      };
+    }
+
     if (diagnoseBtn) {
       diagnoseBtn.onclick = runDiagnose;
     }
@@ -1372,6 +1407,11 @@ function bindActions() {
 
     if (copyRepairBtn) {
       copyRepairBtn.onclick = copyAfterOutput;
+    }
+
+    const copyAuditSummaryBtn = document.getElementById("btn-copy-audit-summary");
+    if (copyAuditSummaryBtn) {
+      copyAuditSummaryBtn.onclick = copyAuditSummary;
     }
 
     bindHistoryActions();
@@ -1533,6 +1573,223 @@ function generateLocalInsight(input, scoreMap) {
   };
 }
 
+function buildAuditSummaryText(state) {
+  const scoreRows = state.rows || getScoreRowsFromMap(state.scores);
+  const averageScore = getAverageScore(scoreRows);
+  const verdict = getOverallVerdict(averageScore);
+  const outputType = state.outputType || "Policy Brief";
+  const profile = state.profile || {};
+  const issues = state.issues || [];
+  const inputExcerpt = (state.input || "").substring(0, 300);
+  const scoreJustifications = state.scoreJustifications || {};
+
+  const scoreLabelsToKeys = {
+    "Claim Accuracy": "claimAccuracy",
+    "Causal Precision": "causalPrecision",
+    "Scope Fidelity": "scopeFidelity",
+    "Method Transparency": "methodTransparency",
+    "Nuance Preservation": "nuancePreservation",
+    "Audience Calibration": "audienceCalibration",
+    "Actionability": "actionability"
+  };
+
+  let summary = `Output Lab Audit Summary
+
+Output Type: ${outputType}
+
+Overall Average: ${averageScore.toFixed(1)}/5
+
+Overall Verdict: ${verdict.text}
+
+Dimension Scores:
+`;
+
+  for (const score of scoreRows) {
+    const justificationKey = scoreLabelsToKeys[score.label];
+    const justification = justificationKey ? (scoreJustifications[justificationKey] || getScoreExplanation(score.label, score.value)) : getScoreExplanation(score.label, score.value);
+    summary += `${score.label}: ${score.value}/5
+${justification}
+
+`;
+  }
+
+  summary += `Failure Flags: ${issues.length ? issues.join(", ") : "None"}
+
+Repair Focus: ${profile.repairFocus || "Not available"}
+
+Input Excerpt: ${inputExcerpt}
+`;
+
+  return summary;
+}
+
+function copyAuditSummary() {
+  if (!latestDiagnoseState) {
+    alert("Run Diagnose before copying an audit summary.");
+    return;
+  }
+
+  const summaryText = buildAuditSummaryText(latestDiagnoseState);
+  const button = document.getElementById("btn-copy-audit-summary");
+
+  if (navigator.clipboard && navigator.clipboard.writeText) {
+    navigator.clipboard.writeText(summaryText).then(() => {
+      if (button) {
+        button.textContent = "Copied!";
+        setTimeout(() => {
+          button.textContent = "Copy Audit Summary";
+        }, 2000);
+      }
+    }).catch(() => {
+      fallbackCopyText(summaryText);
+      if (button) {
+        button.textContent = "Copied!";
+        setTimeout(() => {
+          button.textContent = "Copy Audit Summary";
+        }, 2000);
+      }
+    });
+  } else {
+    fallbackCopyText(summaryText);
+    if (button) {
+      button.textContent = "Copied!";
+      setTimeout(() => {
+        button.textContent = "Copy Audit Summary";
+      }, 2000);
+    }
+  }
+}
+
+function createScoreJustifications(input, scores, outputType, profile) {
+  const text = String(input || "").trim();
+  const lowerText = text.toLowerCase();
+
+  // Detect presence of various evidence cues
+  const hasOverclaim = /\balways\b|\bguarantees?\b|\bproves?\b|\bproven\b|\bsolves?\b|\beliminates?\b|\beveryone\b|\beverywhere\b|\bwill ensure\b|\bdefinitively\b/.test(lowerText);
+  const hasEvidenceLimited = /\bsuggests?\b|\bevidence suggests\b|\bassociated with\b|\bindicates?\b|\bmay\b|\bappears?\b|\bcould\b|\blinked to\b/.test(lowerText);
+  const hasCausalLanguage = /\bcauses?\b|\bleads to\b|\blead to\b|\bimproves?\b|\breduces?\b|\bincreases?\b|\bdrives?\b|\bresults in\b|\bboosts?\b/.test(lowerText);
+  const hasCausalDesign = /\bexperiments?\b|\brandomized\b|\brandomised\b|\bcausal\b|\bfield experiment\b/.test(lowerText);
+  const hasAssociationLanguage = /\bassociated with\b|\blinked to\b|\bcorrelational\b|\bnot causal\b|\bnot proof\b/.test(lowerText);
+  const hasScopeSignals = /\bsample\b|\bpopulation\b|\bsetting\b|\bcontext\b|\bu\.s\.|\bfederal\b|\blocal\b|\bcanadian\b|\bdanish\b|\btime period\b|\bworkforce\b|\bagency context\b/.test(lowerText);
+  const hasOverScope = /\ball agencies\b|\ball public agencies\b|\bevery government\b|\bevery agency\b|\buniversal\b|\beverywhere\b/.test(lowerText);
+  const hasMethodSignal = /\bsurveys?\b|\binterviews?\b|\bexperiments?\b|\bmeta-analysis\b|\bmeta analysis\b|\bsystematic review\b|\bqualitative\b|\bquantitative\b|\bmixed-method\b|\bmixed method\b|\bdata\b|\bdataset\b|\bregression\b|\badministrative records\b|\bcase study\b/.test(lowerText);
+  const hasNuanceCues = /\blimitations?\b|\bcaveats?\b|\bhowever\b|\bmay\b|\bcould\b|\bvaries\b|\bcontext\b|\bnot proof\b|\bconditional\b|\buncertainty\b|\bdepends\b/.test(lowerText);
+  const hasAudienceLanguage = /\bpolicymakers\b|\bpolicy makers\b|\bpractitioners\b|\bagency leaders\b|\bpublic managers\b|\banalysts\b|\bcitizens\b|\bdecision-makers\b|\bdecision makers\b|\bprogram leads\b|\bagency executives\b/.test(lowerText);
+  const hasActionLanguage = /\bpilot\b|\breview\b|\bconsider\b|\btest\b|\badapt\b|\bnext step\b|\brecommend\b|\brecommendation\b|\bdiagnostic\b|\buse the finding\b|\bmonitor\b|\bassess\b|\bevaluate\b/.test(lowerText);
+  const hasRecklessAction = /\bmust immediately\b|\bshould immediately\b|\bevery agency should\b|\bevery government should\b|\ball agencies should\b|\buniversal solution\b|\badopt this solution immediately\b/.test(lowerText);
+  const hasAcademicOnly = /\bp-value\b|\bregression coefficient\b|\btheoretical contribution\b|\bliterature gap\b|\bmodel specification\b/.test(lowerText);
+
+  const claimAccuracyScore = scores.claimAccuracy || 3;
+  const causalPrecisionScore = scores.causalPrecision || 3;
+  const scopeFidelityScore = scores.scopeFidelity || 3;
+  const methodTransparencyScore = scores.methodTransparency || 3;
+  const nuancePreservationScore = scores.nuancePreservation || 3;
+  const audienceCalibrateScore = scores.audienceCalibration || 3;
+  const actionabilityScore = scores.actionability || 3;
+
+  // Generate justifications based on scores and cues
+  let claimAccuracyJustification;
+  if (claimAccuracyScore >= 4) {
+    claimAccuracyJustification = "The draft makes claims that are well-grounded in evidence and appropriately cautious.";
+  } else if (claimAccuracyScore === 3) {
+    claimAccuracyJustification = hasOverclaim
+      ? "The draft uses some absolute language, but the core claim is defensible with closer source grounding."
+      : "The draft stays reasonably close to the source, though some claims could be tightened.";
+  } else {
+    claimAccuracyJustification = hasOverclaim
+      ? "The draft uses overclaim language (e.g., 'always,' 'guarantees') that outruns the source evidence."
+      : "The draft makes claims that need closer source grounding before it becomes practitioner-ready.";
+  }
+
+  let causalPrecisionJustification;
+  if (causalPrecisionScore >= 4) {
+    causalPrecisionJustification = "The draft uses causal language only where the source design supports it, or appropriately signals associations.";
+  } else if (causalPrecisionScore === 3) {
+    causalPrecisionJustification = hasCausalLanguage && !hasCausalDesign
+      ? "The draft uses causal verbs, but the source method is not visible enough to support the causal claim."
+      : hasAssociationLanguage
+        ? "The draft includes some nuance around causality, but could be clearer about the evidence type."
+        : "The draft's causal precision is borderline and needs method context to strengthen.";
+  } else {
+    causalPrecisionJustification = hasCausalLanguage && !hasCausalDesign
+      ? "The draft makes causal claims without visible evidence for causality; reword as associations or evidence-limited language."
+      : "The draft's causal framing is risky given the research design; add method cues or downgrade causal language.";
+  }
+
+  let scopeFidelityJustification;
+  if (scopeFidelityScore >= 4) {
+    scopeFidelityJustification = "The draft clearly names the population, setting, or context that defines where the evidence applies.";
+  } else if (scopeFidelityScore === 3) {
+    scopeFidelityJustification = hasScopeSignals
+      ? "The draft includes some scope cues, but they could be more prominent or precise."
+      : "The draft lacks clear scope signals; add population, setting, or context boundaries.";
+  } else {
+    scopeFidelityJustification = hasOverScope
+      ? "The draft overgeneralizes (e.g., 'all agencies,' 'everywhere'), removing the source's scope limits."
+      : "The draft does not make its scope visible; readers cannot tell if this applies locally or universally.";
+  }
+
+  let methodTransparencyJustification;
+  if (methodTransparencyScore >= 4) {
+    methodTransparencyJustification = "The draft signals the evidence type (survey, experiment, case study, etc.) so readers can calibrate interpretation.";
+  } else if (methodTransparencyScore === 3) {
+    methodTransparencyJustification = hasMethodSignal
+      ? "The draft mentions the method, but the signal is weak or buried in the text."
+      : "The draft does not name the evidence type; add a visible method cue (survey, case study, etc.).";
+  } else {
+    methodTransparencyJustification = "The draft omits the method or evidence type, making claims sound more certain than the source allows.";
+  }
+
+  let nuancePreservationJustification;
+  if (nuancePreservationScore >= 4) {
+    nuancePreservationJustification = "The draft preserves limitations, caveats, and conditional findings; readers see the evidence boundaries.";
+  } else if (nuancePreservationScore === 3) {
+    nuancePreservationJustification = hasNuanceCues
+      ? "The draft includes some nuance language, but limitations could be more visible or concrete."
+      : "The draft lacks clear limitation signals; add caveats or conditional phrasing.";
+  } else {
+    nuancePreservationJustification = hasOverclaim
+      ? "The draft flattens uncertainty by using absolute language and omitting qualifications."
+      : "The draft erases limitations and context, presenting findings as more certain than the source supports.";
+  }
+
+  let audienceCalibrateJustification;
+  if (audienceCalibrateScore >= 4) {
+    audienceCalibrateJustification = "The draft is clearly tuned to the named audience (practitioners, policymakers, etc.) with relevant examples and language.";
+  } else if (audienceCalibrateScore === 3) {
+    audienceCalibrateJustification = hasAudienceLanguage
+      ? "The draft names the audience, but the language or examples could be more audience-specific."
+      : "The draft lacks clear audience signals; add practitioner-relevant language or examples.";
+  } else {
+    audienceCalibrateJustification = hasAcademicOnly
+      ? "The draft uses academic language (p-values, regression coefficients) that will not resonate with practitioners."
+      : "The draft does not clearly signal who the reader is or why this evidence matters to them.";
+  }
+
+  let actionabilityJustification;
+  if (actionabilityScore >= 4) {
+    actionabilityJustification = "The draft offers a realistic, bounded next step that fits what the audience can do with the evidence.";
+  } else if (actionabilityScore === 3) {
+    actionabilityJustification = hasActionLanguage
+      ? "The draft hints at next steps, but the recommendation is not concrete or bounded enough."
+      : "The draft lacks a clear action or next step; add a specific, evidence-aligned recommendation.";
+  } else {
+    actionabilityJustification = hasRecklessAction
+      ? "The draft pushes immediate universal action; replace with a bounded next step tied to the evidence scope."
+      : "The draft gives no clear next step, or the recommendation is too vague to be actionable.";
+  }
+
+  return {
+    claimAccuracy: claimAccuracyJustification,
+    causalPrecision: causalPrecisionJustification,
+    scopeFidelity: scopeFidelityJustification,
+    methodTransparency: methodTransparencyJustification,
+    nuancePreservation: nuancePreservationJustification,
+    audienceCalibration: audienceCalibrateJustification,
+    actionability: actionabilityJustification
+  };
+}
+
 function includesAny(text, cues) {
   return cues.some((cue) => cue instanceof RegExp ? cue.test(text) : text.includes(cue));
 }
@@ -1649,15 +1906,33 @@ async function renderDiagnoseResults(scoreRows, insightText, repairText, scoreMa
       <div style="margin-bottom: 16px;">
         <p style="margin: 0 0 6px; font-size: 12px; color: var(--muted); font-family: var(--font-mono); text-transform: uppercase;">Overall Verdict</p>
         <p id="diagnoseVerdict" style="margin: 0; font-weight: 700; color: ${verdict.color}; min-height: 20px;"></p>
+        <button id="btn-copy-audit-summary" class="action secondary" type="button" style="margin-top: 8px;">Copy Audit Summary</button>
       </div>
       ${scoresBox.innerHTML}
     `;
 
     await typeWriter("diagnoseVerdict", verdict.text, 14);
 
+    const scoreLabelsToKeys = {
+      "Claim Accuracy": "claimAccuracy",
+      "Causal Precision": "causalPrecision",
+      "Scope Fidelity": "scopeFidelity",
+      "Method Transparency": "methodTransparency",
+      "Nuance Preservation": "nuancePreservation",
+      "Audience Calibration": "audienceCalibration",
+      "Actionability": "actionability"
+    };
+
     for (const score of scoreRows) {
       const explanationId = `score-expl-${score.label.toLowerCase().replace(/\s+/g, "-")}`;
-      const explanation = getScoreExplanation(score.label, score.value);
+      const justificationKey = scoreLabelsToKeys[score.label];
+      let explanation = getScoreExplanation(score.label, score.value);
+      
+      // Use scoreJustifications from latestDiagnoseState if available
+      if (latestDiagnoseState && latestDiagnoseState.scoreJustifications && justificationKey) {
+        explanation = latestDiagnoseState.scoreJustifications[justificationKey] || explanation;
+      }
+      
       // eslint-disable-next-line no-await-in-loop
       await typeWriter(explanationId, explanation, 10);
     }
@@ -1674,6 +1949,8 @@ async function renderDiagnoseResults(scoreRows, insightText, repairText, scoreMa
   if (aiRepairPatch) {
     await typeWriter(aiRepairPatch, repairText, 12);
   }
+
+  bindActions();
 }
 
 async function runDiagnose() {
@@ -1788,13 +2065,16 @@ async function runDiagnose() {
       { label: "Actionability", value: scores.actionability }
     ];
 
+    const scoreJustifications = createScoreJustifications(input, scores, selectedOutputType, profile);
+
     latestDiagnoseState = {
       input,
       outputType: selectedOutputType,
       profile,
       issues: [...issues],
       scores: { ...scores },
-      rows: scoreRows
+      rows: scoreRows,
+      scoreJustifications
     };
 
     if (resultBox) {
