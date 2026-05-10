@@ -1210,6 +1210,7 @@ function renderRepair() {
             <h3 style="margin: 0;">${escapeHtml(caseData.repair.diffTitle)}</h3>
             <button id="btn-run-repair" class="action primary" type="button">Generate Repair</button>
           </div>
+          <div id="repairApiStatus" style="font-size: 12px; color: var(--muted); margin-bottom: 12px; font-family: var(--font-mono);"></div>
           <div class="repair-compare-layout">
             <div class="text-block before-report">
               <strong style="color: var(--muted); display:block; margin-bottom: 8px; font-family: var(--font-mono);">${escapeHtml(caseData.repair.beforeLabel)}</strong>
@@ -2117,6 +2118,7 @@ async function generateRepair() {
   const beforeOutput = document.getElementById("beforeOutput");
   const outputBox = document.getElementById("afterOutput");
   const repairButton = document.getElementById("btn-run-repair");
+  const statusElement = document.getElementById("repairApiStatus");
 
   if (!outputBox) {
     return;
@@ -2140,13 +2142,15 @@ async function generateRepair() {
     repairButton.textContent = "Generating...";
   }
 
-  try {
-    outputBox.textContent = "Drafting local repair suggestions...";
-    await wait(1200);
+  if (statusElement) {
+    statusElement.textContent = "";
+  }
 
+  try {
+    // Build fallback repair text first
     const activeScores = latestDiagnoseState ? latestDiagnoseState.scores : createFidelityScores(input);
     const suggestions = buildRepairSuggestions(activeScores);
-    const repaired = [
+    const fallbackRepair = [
       `Output Type: ${selectedOutputType}`,
       `Repair Focus: ${profile.repairFocus}`,
       "",
@@ -2157,8 +2161,51 @@ async function generateRepair() {
       ...suggestions.map((suggestion) => `* ${suggestion}`)
     ].join("\n");
 
-    await typeWriter(outputBox, repaired, 10);
-    updateLatestHistoryRepair(repaired);
+    let finalRepair = fallbackRepair;
+    let statusMessage = "Demo fallback repair used";
+
+    // Try API call
+    try {
+      outputBox.textContent = "Attempting AI-assisted repair...";
+      await wait(500);
+
+      const apiResponse = await fetch("/api/repair", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          input,
+          outputType: selectedOutputType,
+          profile,
+          scores: activeScores,
+          issues: latestDiagnoseState ? latestDiagnoseState.issues : []
+        })
+      });
+
+      if (apiResponse.ok) {
+        const apiData = await apiResponse.json();
+        if (apiData.repairText) {
+          finalRepair = apiData.repairText;
+          statusMessage = "AI-assisted repair generated via API";
+        }
+      } else {
+        console.warn("API call failed:", apiResponse.status);
+      }
+    } catch (apiError) {
+      console.warn("API unavailable:", apiError);
+      statusMessage = "API unavailable; demo fallback repair used";
+    }
+
+    // Display the repair
+    outputBox.textContent = "Drafting repair...";
+    await wait(300);
+    await typeWriter(outputBox, finalRepair, 10);
+
+    // Update status
+    if (statusElement) {
+      statusElement.textContent = statusMessage;
+    }
+
+    updateLatestHistoryRepair(finalRepair);
   } finally {
     if (repairButton) {
       repairButton.disabled = false;

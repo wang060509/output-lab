@@ -102,6 +102,16 @@ These dimensions are used to evaluate whether a translated output preserves rese
 - JavaScript
 - localStorage
 
+## Optional API Mode
+
+The default demo mode works without any API and functions entirely in the browser. For enhanced repair capabilities, optional AI-assisted repair is available when deployed with a backend/serverless platform.
+
+- The API key must be stored as `SILICONFLOW_API_KEY` environment variable.
+- API keys must not be placed in frontend code.
+- Rule-based fallback remains available if the API is unavailable.
+- The API is only used for generating repair text suggestions, not for scoring or analysis.
+- Default model is `Qwen/Qwen2.5-7B-Instruct` (configurable via `SILICONFLOW_MODEL`).
+
 ## Current Limitations
 
 - Rule-based demo only
