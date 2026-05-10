@@ -575,6 +575,7 @@ const MAX_AUDIT_HISTORY = 10;
 let latestDiagnoseState = null;
 let typeWriterToken = 0;
 let panelSwitchToken = 0;
+let isApiRepair = false;
 
 function escapeHtml(value) {
   return String(value)
@@ -757,7 +758,8 @@ function updateLatestHistoryRepair(repairText) {
 
   history[fallbackIndex] = {
     ...history[fallbackIndex],
-    repairText
+    repairText,
+    isApiRepair
   };
   latestDiagnoseState.repairText = repairText;
   writeAuditHistory(history);
@@ -828,6 +830,13 @@ function restoreAuditRecord(recordId) {
 
   if (afterOutput) {
     afterOutput.textContent = record.repairText || "No repair saved for this audit yet.";
+  }
+
+  // Restore and show/hide disclaimer based on whether repair was from API
+  isApiRepair = record.isApiRepair || false;
+  const disclaimerElement = document.getElementById("repairDisclaimer");
+  if (disclaimerElement) {
+    disclaimerElement.style.display = isApiRepair ? "block" : "none";
   }
 
   if (scoresBox) {
@@ -1220,6 +1229,9 @@ function renderRepair() {
               <div class="repair-output-header">
                 <strong>${escapeHtml(caseData.repair.afterLabel)}</strong>
                 <button id="btn-copy-repair" class="action secondary repair-copy" type="button">Copy</button>
+              </div>
+              <div id="repairDisclaimer" style="display: none; margin-bottom: 12px; padding: 8px 12px; border-left: 2px solid var(--muted-soft); background-color: rgba(110, 110, 115, 0.04);">
+                <p style="margin: 0; font-size: 12px; color: var(--muted); font-family: var(--font-mono); line-height: 1.5;">AI-assisted repair draft. Review against source evidence before use.</p>
               </div>
               <pre id="afterOutput">${escapeHtml(caseData.repair.afterText)}</pre>
             </div>
@@ -2163,6 +2175,7 @@ async function generateRepair() {
 
     let finalRepair = fallbackRepair;
     let statusMessage = "Demo fallback repair used";
+    isApiRepair = false;
 
     // Try API call
     try {
@@ -2186,6 +2199,7 @@ async function generateRepair() {
         if (apiData.repairText) {
           finalRepair = apiData.repairText;
           statusMessage = "AI-assisted repair generated via API";
+          isApiRepair = true;
         }
       } else {
         console.warn("API call failed:", apiResponse.status);
@@ -2199,6 +2213,12 @@ async function generateRepair() {
     outputBox.textContent = "Drafting repair...";
     await wait(300);
     await typeWriter(outputBox, finalRepair, 10);
+
+    // Show or hide disclaimer based on repair source
+    const disclaimerElement = document.getElementById("repairDisclaimer");
+    if (disclaimerElement) {
+      disclaimerElement.style.display = isApiRepair ? "block" : "none";
+    }
 
     // Update status
     if (statusElement) {
