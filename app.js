@@ -2174,7 +2174,9 @@ async function generateRepair() {
     ].join("\n");
 
     let finalRepair = fallbackRepair;
-    let statusMessage = "Demo fallback repair used";
+    let statusMessage = "Demo mode only. No external API was called.";
+    let apiProvider = null;
+    let apiModel = null;
     isApiRepair = false;
 
     // Try API call
@@ -2196,18 +2198,34 @@ async function generateRepair() {
 
       if (apiResponse.ok) {
         const apiData = await apiResponse.json();
-        if (apiData.repairText) {
+        
+        // Check if API was successfully used
+        if (apiData.apiUsed === true && apiData.repairText) {
           finalRepair = apiData.repairText;
-          statusMessage = "AI-assisted repair generated via API";
+          statusMessage = `AI-assisted repair generated via ${apiData.provider || 'SiliconFlow'} API.`;
+          apiProvider = apiData.provider;
+          apiModel = apiData.model;
           isApiRepair = true;
+          console.log(`[app.js] API repair successful using model: ${apiModel}`);
+        } 
+        // API exists but failed (apiUsed === false)
+        else if (apiData.apiUsed === false) {
+          statusMessage = "API unavailable. Demo fallback repair used.";
+          apiProvider = apiData.provider;
+          isApiRepair = false;
+          console.warn(`[app.js] API failed, using fallback. Provider: ${apiProvider}`, apiData.errorMessage);
         }
       } else {
-        console.warn("API call failed:", apiResponse.status);
+        console.warn("[app.js] API call failed with status:", apiResponse.status);
+        statusMessage = "API unavailable. Demo fallback repair used.";
       }
     } catch (apiError) {
-      console.warn("API unavailable:", apiError);
-      statusMessage = "API unavailable; demo fallback repair used";
+      console.warn("[app.js] API unavailable:", apiError.message);
+      statusMessage = "API unavailable. Demo fallback repair used.";
     }
+    
+    console.log(`[app.js] /api/repair called. Using: ${isApiRepair ? 'SiliconFlow API' : 'local fallback'}`);
+    console.log(`[app.js] Status message: ${statusMessage}`);
 
     // Display the repair
     outputBox.textContent = "Drafting repair...";
