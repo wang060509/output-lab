@@ -49,25 +49,26 @@ export default async function handler(req, res) {
     console.log(`[repair.js] Using model: ${SILICONFLOW_MODEL}`);
 
     const systemPrompt = `You are repairing an already-generated practitioner-ready research translation draft.
-Do not invent evidence.
-Do not add new statistics.
-Do not strengthen causal claims.
-Preserve limitations, scope, method cues, and uncertainty.
-Use the selected output type and audience profile.
-This is not source verification.
-Produce concise repair guidance or a repaired draft.`;
+  Follow these rules strictly:
+  - Rewrite the draft cleanly and clearly.
+  - Preserve the original structure (headings, sections, and order).
+  - Do not invent evidence, data, or statistics.
+  - Do not strengthen causal claims beyond what the source supports.
+  - Do not repeat words or phrases.
+  - Stop after the Recommendations section; do not add content after that.
+  - Return only the revised draft with no explanatory commentary.`;
 
     const userPrompt = `Selected output type: ${outputType}
-Audience: ${profile?.audience || 'Practitioners'}
-Must include: ${profile?.mustInclude || 'Source-grounded claim, audience context, limitations, practical implication'}
-Main risk: ${profile?.mainRisk || 'Overstated causality, missing scope limits'}
-Repair focus: ${profile?.repairFocus || 'Tighten causal language, restore scope and method cues'}
-Scores: ${JSON.stringify(scores)}
-Issues: ${JSON.stringify(issues)}
-Original draft:
-${cleanedInput}
+  Audience: ${profile?.audience || 'Practitioners'}
+  Must include: ${profile?.mustInclude || 'Source-grounded claim, audience context, limitations, practical implication'}
+  Main risk: ${profile?.mainRisk || 'Overstated causality, missing scope limits'}
+  Repair focus: ${profile?.repairFocus || 'Tighten causal language, restore scope and method cues'}
+  Scores: ${JSON.stringify(scores)}
+  Issues: ${JSON.stringify(issues)}
+  Original draft:
+  ${cleanedInput}
 
-Please provide a repaired version of this draft that addresses the identified issues while preserving fidelity to the original research.`;
+  Please rewrite the draft into a repaired version that follows the system rules above. Return only the revised draft; do not add commentary.`;
 
     try {
       const response = await fetch('https://api.siliconflow.cn/v1/chat/completions', {
@@ -82,8 +83,11 @@ Please provide a repaired version of this draft that addresses the identified is
             { role: 'system', content: systemPrompt },
             { role: 'user', content: userPrompt }
           ],
-          max_tokens: 2000,
-          temperature: 0.3
+          max_tokens: 600,
+          temperature: 0.2,
+          top_p: 0.8,
+          // If provider supports repetition_penalty, include a mild penalty to reduce verbatim repetition
+          repetition_penalty: 1.1
         })
       });
 
@@ -92,10 +96,47 @@ Please provide a repaired version of this draft that addresses the identified is
       }
 
       const data = await response.json();
-      const repairText = data.choices?.[0]?.message?.content?.trim();
+      const repairText = data.choices?.[0]?.message?.content?.trim() || '';
 
-      if (!repairText) {
-        throw new Error('No repair text generated');
+      // Output quality checks
+      function outputFailsQualityChecks(text, sourceInput) {
+        if (!text || text.trim().length === 0) return { fail: true, reason: 'empty' };
+
+        const normalized = text.replace(/[\r\n]+/g, ' ').trim();
+
+        // 1) any single word repeats 5 or more times in a row (e.g., "on on on on on")
+        const repeatedFive = /\b(\w+)(?:\s+\1){4,}\b/i;
+        if (repeatedFive.test(normalized)) return { fail: true, reason: 'repeated_word_5_plus' };
+
+        // 2) obvious repeated phrases like "limited limited limited" (3 or more repeats)
+        const repeatedThree = /\b(\w+)(?:\s+\1){2,}\b/i;
+        if (repeatedThree.test(normalized)) return { fail: true, reason: 'repeated_phrase_3_plus' };
+
+        // 3) more than 3 duplicated adjacent words occurrences (many small repeats)
+        const dupAdjacentRegex = /\b(\w+)\s+\1\b/gi;
+        let dupCount = 0;
+        while (dupAdjacentRegex.exec(normalized)) {
+          dupCount += 1;
+          if (dupCount > 3) return { fail: true, reason: 'too_many_adjacent_duplicates' };
+        }
+
+        // 4) output much shorter than expected: less than 25% of source or under 100 chars
+        const expectedMin = Math.max(100, Math.floor((sourceInput?.length || 0) * 0.25));
+        if (normalized.length < expectedMin) return { fail: true, reason: 'too_short' };
+
+        return { fail: false };
+      }
+
+      const quality = outputFailsQualityChecks(repairText, cleanedInput);
+      if (quality.fail) {
+        console.warn('[repair.js] API output failed quality check:', quality.reason);
+        // Do not return the API output — instruct frontend to use local fallback
+        return res.status(200).json({
+          repairText: null,
+          apiUsed: false,
+          provider: 'local-fallback',
+          errorMessage: 'API output failed quality check. Demo fallback repair used.'
+        });
       }
 
       console.log('[repair.js] API call successful');

@@ -2210,7 +2210,8 @@ async function generateRepair() {
         } 
         // API exists but failed (apiUsed === false)
         else if (apiData.apiUsed === false) {
-          statusMessage = "API unavailable. Demo fallback repair used.";
+          // If backend provided an errorMessage (e.g., quality check failure), show it exactly.
+          statusMessage = apiData.errorMessage || "API unavailable. Demo fallback repair used.";
           apiProvider = apiData.provider;
           isApiRepair = false;
           console.warn(`[app.js] API failed, using fallback. Provider: ${apiProvider}`, apiData.errorMessage);
